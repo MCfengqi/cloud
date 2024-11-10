@@ -75,41 +75,81 @@ public class AdminManageServlet extends HttpServlet {
     }
 
     private void listAdmins(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        String searchTerm = request.getParameter("search");
-        StringBuilder sql = new StringBuilder("SELECT id, username, password, email, mobile FROM users WHERE is_admin = 1");
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            sql.append(" AND username LIKE ?");
-        }
-        
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("[");
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
             
-            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                stmt.setString(1, "%" + searchTerm.trim() + "%");
-            }
+            // 修改 SQL 查询，只查询管理员（is_admin = 1）
+            String sql = "SELECT * FROM users WHERE is_admin = 1";
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
             
-            ResultSet rs = stmt.executeQuery();
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.append("[");
+            
             boolean first = true;
             while (rs.next()) {
                 if (!first) {
                     jsonBuilder.append(",");
                 }
                 first = false;
+                
+                // 获取管理员信息
+                long id = rs.getLong("id");
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+                String email = rs.getString("email");
+                String mobile = rs.getString("mobile");
+                
+                // 构建 JSON 对象
                 jsonBuilder.append("{")
-                    .append("\"id\":").append(rs.getLong("id")).append(",")
-                    .append("\"username\":\"").append(rs.getString("username")).append("\",")
-                    .append("\"password\":\"").append(rs.getString("password")).append("\",")
-                    .append("\"email\":\"").append(rs.getString("email")).append("\",")
-                    .append("\"mobile\":\"").append(rs.getString("mobile")).append("\"")
+                    .append("\"id\":").append(id).append(",")
+                    .append("\"username\":\"").append(escapeJson(username)).append("\",")
+                    .append("\"password\":\"").append(escapeJson(password)).append("\",")
+                    .append("\"email\":\"").append(escapeJson(email)).append("\",")
+                    .append("\"mobile\":\"").append(escapeJson(mobile)).append("\",")
+                    .append("\"isAdmin\":true,")
+                    .append("\"userType\":\"超级管理员\"")
                     .append("}");
+                
+                System.out.println("Found admin: " + username + ", ID: " + id);
             }
+            
             jsonBuilder.append("]");
-            response.getWriter().write(jsonBuilder.toString());
+            
+            String jsonResponse = jsonBuilder.toString();
+            System.out.println("JSON Response: " + jsonResponse);
+            
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(jsonResponse);
+            
+        } catch (Exception e) {
+            System.err.println("Error in listAdmins: " + e.getMessage());
+            e.printStackTrace();
+            response.getWriter().write("[{\"error\":\"" + escapeJson(e.getMessage()) + "\"}]");
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
         }
+    }
+
+    // 添加 escapeJson 方法
+    private String escapeJson(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\b", "\\b")
+                    .replace("\f", "\\f")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t");
     }
 
     private void addAdmin(HttpServletRequest request, HttpServletResponse response) 

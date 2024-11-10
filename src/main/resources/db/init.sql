@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     mobile VARCHAR(20) NOT NULL COMMENT '手机号码',
     is_admin TINYINT(1) DEFAULT 0 COMMENT '是否是管理员：0-普通用户，1-管理员',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后登录时间',
     INDEX idx_username (username) COMMENT '用户名索引',
     INDEX idx_email (email) COMMENT '邮箱索引',
     INDEX idx_mobile (mobile) COMMENT '手机号索引'

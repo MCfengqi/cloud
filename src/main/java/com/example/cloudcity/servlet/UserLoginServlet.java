@@ -41,6 +41,7 @@ public class UserLoginServlet extends HttpServlet {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("username", username);
                 session.setAttribute("isAdmin", userInfo.isAdmin);
+                session.setAttribute("lastLoginTime", userInfo.lastLoginTime);
                 
                 System.out.println("Login successful - Username: " + username + ", IsAdmin: " + userInfo.isAdmin);
                 System.out.println("Session ID: " + session.getId());
@@ -63,32 +64,43 @@ public class UserLoginServlet extends HttpServlet {
     private static class UserInfo {
         String username;
         boolean isAdmin;
+        java.sql.Timestamp lastLoginTime;
         
-        UserInfo(String username, boolean isAdmin) {
+        UserInfo(String username, boolean isAdmin, java.sql.Timestamp lastLoginTime) {
             this.username = username;
             this.isAdmin = isAdmin;
+            this.lastLoginTime = lastLoginTime;
         }
     }
     
     private UserInfo validateLogin(String username, String password) {
         Connection conn = null;
         PreparedStatement pstmt = null;
+        PreparedStatement updateStmt = null;
         ResultSet rs = null;
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             
-            String sql = "SELECT username, is_admin FROM users WHERE username = ? AND password = ?";
+            // 验证用户名和密码
+            String sql = "SELECT username, is_admin, updated_at FROM users WHERE username = ? AND password = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             
             rs = pstmt.executeQuery();
             if (rs.next()) {
+                // 更新最后登录时间
+                String updateSql = "UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE username = ?";
+                updateStmt = conn.prepareStatement(updateSql);
+                updateStmt.setString(1, username);
+                updateStmt.executeUpdate();
+                
                 return new UserInfo(
                     rs.getString("username"),
-                    rs.getBoolean("is_admin")
+                    rs.getBoolean("is_admin"),
+                    rs.getTimestamp("updated_at")
                 );
             }
             return null;
@@ -100,6 +112,7 @@ public class UserLoginServlet extends HttpServlet {
             try {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
+                if (updateStmt != null) updateStmt.close();
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
