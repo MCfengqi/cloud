@@ -41,7 +41,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>迎来到云城游戏管理系统</h1>
+        <h1>欢迎来到云城游戏管理系统</h1>
         <p>请登录以继续使用系统！</p>
         <a href="login.jsp">
             <button>登录</button>
