@@ -1,5 +1,8 @@
 # CloudCity 游戏管理系统
 ![image](https://github.com/user-attachments/assets/543056b1-7978-4403-bfe8-d531a78eacfa)
+![image](https://github.com/user-attachments/assets/d5813c68-bef0-4d83-81cf-ae68a384a3a3)
+![image](https://github.com/user-attachments/assets/381a70d4-6d89-4454-bbab-19821041ab87)
+
 
 
 
