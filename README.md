@@ -1,4 +1,7 @@
 # CloudCity 游戏管理系统
+![image](https://github.com/user-attachments/assets/543056b1-7978-4403-bfe8-d531a78eacfa)
+
+
 
 ## 项目简介
 CloudCity 是一个基于 Java Web 技术栈开发的游戏管理系统，使用 Servlet 处理 HTTP 请求，MySQL 作为数据存储。
