@@ -5,9 +5,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 @WebServlet("/AdminManageServlet")
 public class AdminManageServlet extends HttpServlet {
@@ -43,11 +46,11 @@ public class AdminManageServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        String action = request.getParameter("action");
-
+        
         // 检查是否是管理员
         Boolean isAdmin = (Boolean) request.getSession().getAttribute("isAdmin");
         if (isAdmin == null || !isAdmin) {
@@ -56,18 +59,48 @@ public class AdminManageServlet extends HttpServlet {
         }
 
         try {
-            switch (action) {
-                case "add":
-                    addAdmin(request, response);
-                    break;
-                case "update":
-                    updateAdmin(request, response);
-                    break;
-                case "delete":
-                    deleteAdmin(request, response);
-                    break;
-                default:
-                    response.getWriter().write("{\"error\": \"Unknown action\"}");
+            // 如果是 JSON 请求
+            if (request.getContentType() != null && request.getContentType().contains("application/json")) {
+                // 读取 JSON 数据
+                StringBuilder buffer = new StringBuilder();
+                String line;
+                try (BufferedReader reader = request.getReader()) {
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                }
+                
+                // 解析 JSON
+                Gson gson = new Gson();
+                JsonObject jsonObject = gson.fromJson(buffer.toString(), JsonObject.class);
+                String action = jsonObject.get("action").getAsString();
+                
+                switch (action) {
+                    case "update":
+                        updateAdmin(jsonObject, response);
+                        break;
+                    case "add":
+                        addAdmin(request, response);
+                        break;
+                    case "delete":
+                        deleteAdmin(request, response);
+                        break;
+                    default:
+                        response.getWriter().write("{\"error\": \"Unknown action\"}");
+                }
+            } else {
+                // 处理普通表单提交
+                String action = request.getParameter("action");
+                switch (action) {
+                    case "add":
+                        addAdmin(request, response);
+                        break;
+                    case "delete":
+                        deleteAdmin(request, response);
+                        break;
+                    default:
+                        response.getWriter().write("{\"error\": \"Unknown action\"}");
+                }
             }
         } catch (Exception e) {
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
@@ -80,12 +113,21 @@ public class AdminManageServlet extends HttpServlet {
         ResultSet rs = null;
         
         try {
+            String searchTerm = request.getParameter("search");
+            StringBuilder sql = new StringBuilder("SELECT * FROM users WHERE is_admin = 1");
+            
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                sql.append(" AND username LIKE ?");
+            }
+            
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.prepareStatement(sql.toString());
             
-            // 修改 SQL 查询，只查询管理员（is_admin = 1）
-            String sql = "SELECT * FROM users WHERE is_admin = 1";
-            stmt = conn.prepareStatement(sql);
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                stmt.setString(1, "%" + searchTerm.trim() + "%");
+            }
+            
             rs = stmt.executeQuery();
             
             StringBuilder jsonBuilder = new StringBuilder();
@@ -173,33 +215,69 @@ public class AdminManageServlet extends HttpServlet {
         }
     }
 
-    private void updateAdmin(HttpServletRequest request, HttpServletResponse response) 
+    private void updateAdmin(JsonObject data, HttpServletResponse response) 
             throws SQLException, IOException {
-        long id = Long.parseLong(request.getParameter("id"));
-        String email = request.getParameter("email");
-        String mobile = request.getParameter("mobile");
-        String password = request.getParameter("password");
+        long id = data.get("id").getAsLong();
+        String email = data.get("email").getAsString();
+        String mobile = data.get("mobile").getAsString();
+        boolean isAdmin = data.get("isAdmin").getAsBoolean();
+        String password = data.has("password") ? data.get("password").getAsString() : null;
         
-        StringBuilder sql = new StringBuilder("UPDATE users SET email = ?, mobile = ?");
-        if (password != null && !password.trim().isEmpty()) {
-            sql.append(", password = ?");
-        }
-        sql.append(" WHERE id = ? AND is_admin = 1");
+        System.out.println("Updating admin - ID: " + id + ", isAdmin: " + isAdmin);
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
             
-            stmt.setString(1, email);
-            stmt.setString(2, mobile);
-            if (password != null && !password.trim().isEmpty()) {
-                stmt.setString(3, password);
-                stmt.setLong(4, id);
-            } else {
-                stmt.setLong(3, id);
+            // 首先检查是否是最后一个管理员
+            if (!isAdmin) {
+                String countSql = "SELECT COUNT(*) FROM users WHERE is_admin = 1 AND id != ?";
+                try (PreparedStatement countStmt = conn.prepareStatement(countSql)) {
+                    countStmt.setLong(1, id);
+                    ResultSet rs = countStmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        response.getWriter().write("{\"success\": false, \"error\": \"不能将最后一个管理员改为普通用户！\"}");
+                        return;
+                    }
+                }
             }
             
+            // 构建更新 SQL
+            StringBuilder sql = new StringBuilder("UPDATE users SET email = ?, mobile = ?, is_admin = ?");
+            if (password != null && !password.trim().isEmpty()) {
+                sql.append(", password = ?");
+            }
+            sql.append(" WHERE id = ?");
+            
+            stmt = conn.prepareStatement(sql.toString());
+            
+            // 设置参数
+            int paramIndex = 1;
+            stmt.setString(paramIndex++, email);
+            stmt.setString(paramIndex++, mobile);
+            stmt.setInt(paramIndex++, isAdmin ? 1 : 0);
+            
+            if (password != null && !password.trim().isEmpty()) {
+                stmt.setString(paramIndex++, password);
+            }
+            stmt.setLong(paramIndex, id);
+            
+            // 执行更新
             int result = stmt.executeUpdate();
+            
+            System.out.println("Update result: " + result);
+            
             response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            
+        } catch (Exception e) {
+            System.err.println("Error updating admin: " + e.getMessage());
+            e.printStackTrace();
+            response.getWriter().write("{\"success\": false, \"error\": \"" + escapeJson(e.getMessage()) + "\"}");
+        } finally {
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
         }
     }
 
@@ -207,14 +285,25 @@ public class AdminManageServlet extends HttpServlet {
             throws SQLException, IOException {
         long id = Long.parseLong(request.getParameter("id"));
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM users WHERE id = ? AND is_admin = 1")) {
+        // 检查是否是最后一个管理员
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            // 首先检查管理员总数
+            String countSql = "SELECT COUNT(*) FROM users WHERE is_admin = 1";
+            try (PreparedStatement countStmt = conn.prepareStatement(countSql)) {
+                ResultSet rs = countStmt.executeQuery();
+                if (rs.next() && rs.getInt(1) <= 1) {
+                    response.getWriter().write("{\"success\": false, \"error\": \"不能删除最后一个管理员！\"}");
+                    return;
+                }
+            }
             
-            stmt.setLong(1, id);
-            
-            int result = stmt.executeUpdate();
-            response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            // 如果不是最后一个管理员，则执行删除
+            String deleteSql = "DELETE FROM users WHERE id = ? AND is_admin = 1";
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+                deleteStmt.setLong(1, id);
+                int result = deleteStmt.executeUpdate();
+                response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            }
         }
     }
 
@@ -224,23 +313,33 @@ public class AdminManageServlet extends HttpServlet {
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT id, username, email, mobile FROM users WHERE id = ? AND is_admin = 1")) {
+                     "SELECT * FROM users WHERE id = ? AND is_admin = 1")) {
             
             stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
+                // 构建完整的用户信息
                 StringBuilder jsonBuilder = new StringBuilder();
                 jsonBuilder.append("{")
                     .append("\"id\":").append(rs.getLong("id")).append(",")
-                    .append("\"username\":\"").append(rs.getString("username")).append("\",")
-                    .append("\"email\":\"").append(rs.getString("email")).append("\",")
-                    .append("\"mobile\":\"").append(rs.getString("mobile")).append("\"")
+                    .append("\"username\":\"").append(escapeJson(rs.getString("username"))).append("\",")
+                    .append("\"password\":\"").append(escapeJson(rs.getString("password"))).append("\",")
+                    .append("\"email\":\"").append(escapeJson(rs.getString("email"))).append("\",")
+                    .append("\"mobile\":\"").append(escapeJson(rs.getString("mobile"))).append("\",")
+                    .append("\"isAdmin\":").append(rs.getInt("is_admin") == 1).append(",")
+                    .append("\"userType\":\"").append(rs.getInt("is_admin") == 1 ? "超级管理员" : "普通用户").append("\"")
                     .append("}");
+
+                System.out.println("Admin JSON response: " + jsonBuilder.toString());
                 response.getWriter().write(jsonBuilder.toString());
             } else {
                 response.getWriter().write("{\"error\": \"Admin not found\"}");
             }
+        } catch (Exception e) {
+            System.err.println("Error in getAdmin: " + e.getMessage());
+            e.printStackTrace();
+            response.getWriter().write("{\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
         }
     }
 } 

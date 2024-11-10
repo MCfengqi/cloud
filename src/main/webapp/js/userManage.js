@@ -92,7 +92,7 @@ function viewUser(id) {
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
                 <div class="view-container">
-                    <h3>用户详情</h3>
+                    <h3>户详情</h3>
                     <div class="detail-group">
                         <label>ID</label>
                         <div class="detail-value">${user.id}</div>
@@ -151,7 +151,7 @@ function editUser(id) {
                     <form id="editUserForm" onsubmit="updateUser(event, ${user.id})">
                         <div class="form-group">
                             <label>用户名</label>
-                            <input type="text" value="${user.username}" disabled class="form-control">
+                            <input type="text" name="username" value="${user.username}" required class="form-control">
                         </div>
                         <div class="form-group">
                             <label>新密码（不修改请留空）</label>
@@ -166,9 +166,11 @@ function editUser(id) {
                             <input type="text" name="mobile" value="${user.mobile}" required class="form-control" pattern="^1[3-9]\\d{9}$">
                         </div>
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="isAdmin" ${user.isAdmin ? 'checked' : ''} value="true"> 是否是管理员
-                            </label>
+                            <label>用户类型</label>
+                            <select name="userType" class="form-control">
+                                <option value="0" ${!user.isAdmin ? 'selected' : ''}>普通用户</option>
+                                <option value="1" ${user.isAdmin ? 'selected' : ''}>超级管理员</option>
+                            </select>
                         </div>
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">保存</button>
@@ -235,25 +237,72 @@ function updateUser(event, id) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    formData.append('id', id);
-    formData.append('action', 'update');
+    
+    // 获取所有表单字段的值
+    const username = formData.get('username');
+    const email = formData.get('email');
+    const mobile = formData.get('mobile');
+    const password = formData.get('password');
+    const userType = formData.get('userType');
+    
+    // 验证必填字段
+    if (!username) {
+        alert('用户名不能为空！');
+        return;
+    }
+    if (!email) {
+        alert('邮箱不能为空！');
+        return;
+    }
+    if (!mobile) {
+        alert('手机号不能为空！');
+        return;
+    }
+    
+    // 构建要发送的数据对象
+    const data = {
+        id: id,
+        action: 'update',
+        username: username,
+        email: email,
+        mobile: mobile,
+        password: password || '',
+        isAdmin: userType === '1'
+    };
+    
+    console.log('Sending data:', data);
 
     fetch('UserManageServlet', {
         method: 'POST',
-        body: new URLSearchParams(formData)
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            alert('更新成功！');
-            closeModal();
-            loadUserList();
-        } else {
-            alert(result.error || '更新失败！');
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(text => {
+        console.log('Response text:', text);
+        try {
+            const result = JSON.parse(text);
+            if (result.success) {
+                alert('更新成功！');
+                closeModal();
+                loadUserList();
+            } else {
+                alert('更新失败：' + (result.error || '未知错误'));
+            }
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            alert('更新失败：服务器响应格式错误');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('系统错误，请稍后重试！');
+        alert('系统错误：' + error.message);
     });
 } 
