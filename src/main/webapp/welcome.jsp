@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>欢迎 - CloudCity</title>
+    <title>云城游戏管理系统</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入外部CSS文件 -->
@@ -30,9 +30,14 @@
     <div class="layout">
         <!-- 左侧导航 -->
         <div class="sidebar">
+            <!-- 系统标题 -->
+            <div class="system-title">
+                <span class="logo">🎮</span>
+                <h1>云城游戏管理系统</h1>
+            </div>
+
             <!-- 菜单部分 -->
             <ul class="menu">
-                <li class="menu-title">系统首页</li>
                 <li class="menu-item">
                     <div class="menu-item-wrapper" onclick="toggleSubmenu('systemManage')">
                         <div class="menu-item-content">
@@ -84,7 +89,7 @@
             </div>
             <div class="content-body" id="contentBody">
                 <!-- 初始内容 -->
-                <h3>欢迎使用 CloudCity 系统</h3>
+                <h3>欢迎使用云城游戏管理系统</h3>
             </div>
         </div>
     </div>
