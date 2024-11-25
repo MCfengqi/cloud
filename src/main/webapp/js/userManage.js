@@ -1,62 +1,120 @@
+function addUser() {
+    const content = `
+        <h3>添加用户</h3>
+        <form id="addUserForm" onsubmit="submitAddUser(event)">
+            <div class="form-group">
+                <label>用户名：</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>密码：</label>
+                <input type="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label>邮箱：</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>手机号：</label>
+                <input type="text" name="mobile" required>
+            </div>
+            <div class="form-group">
+                <label>用户类型：</label>
+                <select name="userType">
+                    <option value="0">普通用户</option>
+                    <option value="1">管理员</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+        </form>
+    `;
+    openModal(content);
+}
+
+function editUser(id) {
+    fetch(`UserManageServlet?action=get&id=${id}`)
+        .then(response => response.json())
+        .then(user => {
+            const content = `
+                <h3>编辑用户</h3>
+                <form id="editUserForm" onsubmit="updateUser(event, ${id})">
+                    <div class="form-group">
+                        <label>用户名：</label>
+                        <input type="text" name="username" value="${user.username}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>新密码：</label>
+                        <input type="password" name="password" placeholder="留空表示不修改">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱：</label>
+                        <input type="email" name="email" value="${user.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号：</label>
+                        <input type="text" name="mobile" value="${user.mobile}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>用户类型：</label>
+                        <select name="userType">
+                            <option value="0" ${!user.isAdmin ? 'selected' : ''}>普通用户</option>
+                            <option value="1" ${user.isAdmin ? 'selected' : ''}>管理员</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    </div>
+                </form>
+            `;
+            openModal(content);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('加载用户信息失败');
+        });
+}
+
 // 加载用户列表
 function loadUserList() {
-    console.log('开始加载用户列表');
+    console.log('Loading user list...');
     const tbody = document.querySelector('#userTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">正在加载数据...</td></tr>';
     
     fetch('UserManageServlet?action=list')
         .then(response => {
             console.log('Response status:', response.status);
-            return response.text();
+            return response.json();
         })
-        .then(text => {
-            console.log('Raw response:', text);
-            const users = JSON.parse(text);
-            console.log('Parsed users:', users);
-            
-            if (!Array.isArray(users)) {
-                throw new Error('返回的数据格式不正确');
-            }
-            
+        .then(users => {
+            console.log('Received users:', users);
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">没有找到用户数据</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">没有用户数据</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = users.map(user => {
-                const id = user.id;
-                const username = user.username || '';
-                const password = user.password || '';
-                const email = user.email || '';
-                const mobile = user.mobile || '';
-                const userType = user.userType || '';
-                
-                return `
-                    <tr>
-                        <td style="color: #333;">${id}</td>
-                        <td style="color: #333;">${username}</td>
-                        <td style="color: #333;">${password}</td>
-                        <td style="color: #333;">${email}</td>
-                        <td style="color: #333;">${mobile}</td>
-                        <td style="color: #333;">${userType}</td>
-                        <td>
-                            <div class="btn-group">
-                                <button class="btn btn-primary" onclick="viewUser(${id})">
-                                    <span class="menu-icon">👁️</span>查看
-                                </button>
-                                <button class="btn btn-warning" onclick="editUser(${id})">
-                                    <span class="menu-icon">✏️</span>编辑
-                                </button>
-                                <button class="btn btn-danger" onclick="deleteUser(${id})">
-                                    <span class="menu-icon">🗑️</span>删除
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            console.log('用户列表渲染完成');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.password}</td>
+                    <td>${user.email || ''}</td>
+                    <td>${user.mobile || ''}</td>
+                    <td>${user.isAdmin ? '管理员' : '普通用户'}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-warning" onclick="editUser(${user.id})">
+                                <span class="menu-icon">✏️</span>编辑
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id})">
+                                <span class="menu-icon">🗑️</span>删除
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
         })
         .catch(error => {
             console.error('Error:', error);
@@ -65,171 +123,50 @@ function loadUserList() {
         });
 }
 
-// 查看用户详情
-function viewUser(id) {
-    if (typeof id === 'undefined' || id === null) {
-        console.error('Invalid user ID:', id);
-        alert('无效的用户ID');
-        return;
-    }
+// 搜索用户
+function searchUsers() {
+    const searchText = document.getElementById('userSearchInput').value.toLowerCase();
+    const tbody = document.querySelector('#userTable tbody');
+    const rows = tbody.getElementsByTagName('tr');
     
-    fetch(`UserManageServlet?action=get&id=${id}`)
-        .then(response => response.text())
-        .then(text => {
-            console.log('View response:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                throw new Error('服务器响应格式错误');
+    for (let row of rows) {
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+        
+        for (let cell of cells) {
+            if (cell.textContent.toLowerCase().includes(searchText)) {
+                found = true;
+                break;
             }
-        })
-        .then(user => {
-            if (!user || user.error) {
-                throw new Error(user.error || '获取用户信息失败');
-            }
-            
-            const modalContent = document.getElementById('modalContent');
-            modalContent.innerHTML = `
-                <div class="view-container">
-                    <h3>户详情</h3>
-                    <div class="detail-group">
-                        <label>ID</label>
-                        <div class="detail-value">${user.id}</div>
-                    </div>
-                    <div class="detail-group">
-                        <label>用户名</label>
-                        <div class="detail-value">${user.username}</div>
-                    </div>
-                    <div class="detail-group">
-                        <label>密码</label>
-                        <div class="detail-value">${user.password}</div>
-                    </div>
-                    <div class="detail-group">
-                        <label>邮箱</label>
-                        <div class="detail-value">${user.email}</div>
-                    </div>
-                    <div class="detail-group">
-                        <label>手机号</label>
-                        <div class="detail-value">${user.mobile}</div>
-                    </div>
-                    <div class="detail-group">
-                        <label>用户类型</label>
-                        <div class="detail-value">${user.userType}</div>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('userModal').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('加载用户详情失败：' + error.message);
-        });
-}
-
-// 编辑用户
-function editUser(id) {
-    if (!id) {
-        console.error('Invalid user ID:', id);
-        alert('无效的用户ID');
-        return;
+        }
+        
+        row.style.display = found ? '' : 'none';
     }
-    
-    fetch(`UserManageServlet?action=get&id=${id}`)
-        .then(response => response.text())
-        .then(text => {
-            console.log('Raw response:', text);
-            const user = JSON.parse(text);
-            
-            const modalContent = document.getElementById('modalContent');
-            modalContent.innerHTML = `
-                <div class="edit-container">
-                    <h3>编辑用户</h3>
-                    <form id="editUserForm" onsubmit="updateUser(event, ${user.id})">
-                        <div class="form-group">
-                            <label>用户名</label>
-                            <input type="text" name="username" value="${user.username}" required class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>新密码（不修改请留空）</label>
-                            <input type="password" name="password" class="form-control" placeholder="输入新密码">
-                        </div>
-                        <div class="form-group">
-                            <label>邮箱</label>
-                            <input type="email" name="email" value="${user.email}" required class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>手机号</label>
-                            <input type="text" name="mobile" value="${user.mobile}" required class="form-control" pattern="^1[3-9]\\d{9}$">
-                        </div>
-                        <div class="form-group">
-                            <label>用户类型</label>
-                            <select name="userType" class="form-control">
-                                <option value="0" ${!user.isAdmin ? 'selected' : ''}>普通用户</option>
-                                <option value="1" ${user.isAdmin ? 'selected' : ''}>超级管理员</option>
-                            </select>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="btn btn-primary">保存</button>
-                            <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.getElementById('userModal').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('加载用户信息失败');
-        });
 }
 
 // 删除用户
 function deleteUser(id) {
-    if (typeof id === 'undefined' || id === null) {
-        console.error('Invalid user ID:', id);
-        alert('无效的用户ID');
-        return;
-    }
-    
     if (confirm('确定要删除这个用户吗？')) {
-        fetch(`UserManageServlet?action=delete&id=${id}`, {
+        fetch('UserManageServlet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-            }
+            },
+            body: `action=delete&id=${id}`
         })
-        .then(response => response.text())
-        .then(text => {
-            console.log('Delete response:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                throw new Error('服务器响应格式错误');
-            }
-        })
+        .then(response => response.json())
         .then(result => {
             if (result.success) {
-                alert('删除成功！');
-                loadUserList();
+                loadUserList();  // 重新加载用户列表
             } else {
-                alert(result.error || '删除失败！');
+                alert('删除失败：' + result.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('操作失败：' + error.message);
+            alert('删除失败');
         });
     }
-}
-
-// 关闭弹窗
-function closeModal() {
-    document.getElementById('userModal').style.display = 'none';
 }
 
 // 更新用户信息
@@ -237,41 +174,67 @@ function updateUser(event, id) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    
-    // 获取所有表单字段的值
-    const username = formData.get('username');
-    const email = formData.get('email');
-    const mobile = formData.get('mobile');
-    const password = formData.get('password');
-    const userType = formData.get('userType');
-    
-    // 验证必填字段
-    if (!username) {
-        alert('用户名不能为空！');
-        return;
-    }
-    if (!email) {
-        alert('邮箱不能为空！');
-        return;
-    }
-    if (!mobile) {
-        alert('手机号不能为空！');
-        return;
-    }
-    
-    // 构建要发送的数据对象
     const data = {
         id: id,
         action: 'update',
-        username: username,
-        email: email,
-        mobile: mobile,
-        password: password || '',
-        isAdmin: userType === '1'
+        username: formData.get('username'),
+        password: formData.get('password'),
+        email: formData.get('email'),
+        mobile: formData.get('mobile'),
+        isAdmin: formData.get('userType') === '1'
     };
     
-    console.log('Sending data:', data);
+    fetch('UserManageServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('更新成功！');
+            closeModal();
+            loadUserList();
+        } else {
+            alert('更新失败：' + (result.error || '未知错误'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('系统错误：' + error.message);
+    });
+}
 
+// 提交添加用户表单
+function submitAddUser(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    // 获取并验证表单数据
+    const username = formData.get('username').trim();
+    const password = formData.get('password').trim();
+    const email = formData.get('email').trim();
+    const mobile = formData.get('mobile').trim();
+    
+    if (!username || !password || !email || !mobile) {
+        alert('请填写所有必填字段');
+        return;
+    }
+    
+    const data = {
+        action: 'add',
+        username: username,
+        password: password,
+        email: email,
+        mobile: mobile,
+        isAdmin: formData.get('userType') === '1'
+    };
+    
+    console.log('Submitting user data:', data);
+    
     fetch('UserManageServlet', {
         method: 'POST',
         headers: {
@@ -283,22 +246,15 @@ function updateUser(event, id) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        return response.text();
+        return response.json();
     })
-    .then(text => {
-        console.log('Response text:', text);
-        try {
-            const result = JSON.parse(text);
-            if (result.success) {
-                alert('更新成功！');
-                closeModal();
-                loadUserList();
-            } else {
-                alert('更新失败：' + (result.error || '未知错误'));
-            }
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            alert('更新失败：服务器响应格式错误');
+    .then(result => {
+        if (result.success) {
+            alert('添加成功！');
+            closeModal();
+            loadUserList();
+        } else {
+            alert('添加失败：' + (result.error || '未知错误'));
         }
     })
     .catch(error => {

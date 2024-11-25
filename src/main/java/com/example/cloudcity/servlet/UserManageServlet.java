@@ -1,3 +1,12 @@
+/**
+ * 用户管理Servlet
+ * 用途：处理用户相关的所有后端请求，包括：
+ * 1. 用户列表的获取
+ * 2. 用户信息的添加
+ * 3. 用户信息的修改
+ * 4. 用户的删除
+ * 5. 用户权限的管理
+ */
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
@@ -12,7 +21,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 
-@WebServlet("/UserManageServlet")
 public class UserManageServlet extends HttpServlet {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
     private static final String USER = "cloudcity";
@@ -69,7 +77,7 @@ public class UserManageServlet extends HttpServlet {
                         updateUser(jsonObject, response);
                         break;
                     case "add":
-                        addUser(request, response);
+                        addUserFromJson(jsonObject, response);
                         break;
                     case "delete":
                         deleteUser(request, response);
@@ -82,7 +90,7 @@ public class UserManageServlet extends HttpServlet {
                 String action = request.getParameter("action");
                 switch (action) {
                     case "add":
-                        addUser(request, response);
+                        addUserFromForm(request, response);
                         break;
                     case "delete":
                         deleteUser(request, response);
@@ -159,26 +167,72 @@ public class UserManageServlet extends HttpServlet {
         }
     }
 
-    private void addUser(HttpServletRequest request, HttpServletResponse response) 
+    private void addUserFromJson(JsonObject jsonObject, HttpServletResponse response) 
+            throws SQLException, IOException {
+        System.out.println("Received data: " + jsonObject.toString());
+        
+        // 获取并验证必填字段
+        if (!jsonObject.has("username") || !jsonObject.has("password") || 
+            !jsonObject.has("email") || !jsonObject.has("mobile")) {
+            response.getWriter().write("{\"success\": false, \"error\": \"缺少必填字段\"}");
+            return;
+        }
+        
+        String username = jsonObject.get("username").getAsString();
+        String password = jsonObject.get("password").getAsString();
+        String email = jsonObject.get("email").getAsString();
+        String mobile = jsonObject.get("mobile").getAsString();
+        boolean isAdmin = jsonObject.has("isAdmin") && jsonObject.get("isAdmin").getAsBoolean();
+        
+        // 验证字段不为空
+        if (username.trim().isEmpty() || password.trim().isEmpty()) {
+            response.getWriter().write("{\"success\": false, \"error\": \"用户名和密码不能为空\"}");
+            return;
+        }
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "INSERT INTO users (username, password, email, mobile, is_admin, created_at, updated_at) " +
+                        "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, username.trim());
+                stmt.setString(2, password.trim());
+                stmt.setString(3, email.trim());
+                stmt.setString(4, mobile.trim());
+                stmt.setBoolean(5, isAdmin);
+                
+                int result = stmt.executeUpdate();
+                response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in addUser: " + e.getMessage());
+            e.printStackTrace();
+            response.getWriter().write("{\"success\": false, \"error\": \"" + escapeJson(e.getMessage()) + "\"}");
+        }
+    }
+
+    private void addUserFromForm(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
         String mobile = request.getParameter("mobile");
-        boolean isAdmin = Boolean.parseBoolean(request.getParameter("isAdmin"));
+        boolean isAdmin = "1".equals(request.getParameter("userType"));
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO users (username, password, email, mobile, is_admin) VALUES (?, ?, ?, ?, ?)")) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "INSERT INTO users (username, password, email, mobile, is_admin, created_at, updated_at) " +
+                        "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
             
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            stmt.setString(3, email);
-            stmt.setString(4, mobile);
-            stmt.setBoolean(5, isAdmin);
-            
-            int result = stmt.executeUpdate();
-            response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.setString(3, email);
+                stmt.setString(4, mobile);
+                stmt.setBoolean(5, isAdmin);
+                
+                int result = stmt.executeUpdate();
+                response.getWriter().write("{\"success\": " + (result > 0) + "}");
+            }
         }
     }
 
