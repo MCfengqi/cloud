@@ -442,6 +442,14 @@
                             </div>
                         </div>
                     </li>
+                    <li class="menu-item">
+                        <div class="menu-item-wrapper" onclick="location.href='index.jsp'">
+                            <div class="menu-item-content">
+                                <span class="menu-icon">🏠</span>
+                                <span>返回网站</span>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
 
