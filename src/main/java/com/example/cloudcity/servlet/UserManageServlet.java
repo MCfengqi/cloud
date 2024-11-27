@@ -134,6 +134,8 @@ public class UserManageServlet extends HttpServlet {
                 String password = rs.getString("password");
                 String email = rs.getString("email");
                 String mobile = rs.getString("mobile");
+                Timestamp created_at = rs.getTimestamp("created_at");
+                Timestamp updated_at = rs.getTimestamp("updated_at");
                 
                 jsonBuilder.append("{")
                     .append("\"id\":").append(id).append(",")
@@ -141,6 +143,8 @@ public class UserManageServlet extends HttpServlet {
                     .append("\"password\":\"").append(escapeJson(password)).append("\",")
                     .append("\"email\":\"").append(escapeJson(email)).append("\",")
                     .append("\"mobile\":\"").append(escapeJson(mobile)).append("\",")
+                    .append("\"created_at\":\"").append(created_at != null ? created_at.toString() : "").append("\",")
+                    .append("\"updated_at\":\"").append(updated_at != null ? updated_at.toString() : "").append("\",")
                     .append("\"isAdmin\":false,")
                     .append("\"userType\":\"普通用户\"")
                     .append("}");
@@ -243,7 +247,7 @@ public class UserManageServlet extends HttpServlet {
             String username = data.get("username").getAsString();
             String email = data.get("email").getAsString();
             String mobile = data.get("mobile").getAsString();
-            boolean isAdmin = data.get("isAdmin").getAsBoolean();
+            boolean isAdmin = data.has("is_admin") ? data.get("is_admin").getAsBoolean() : false;
             String password = data.has("password") ? data.get("password").getAsString() : null;
             
             System.out.println("Updating user - ID: " + id + ", Username: " + username + ", IsAdmin: " + isAdmin);
@@ -255,7 +259,7 @@ public class UserManageServlet extends HttpServlet {
                 conn = DriverManager.getConnection(DB_URL, USER, PASS);
                 
                 // 构建更新 SQL
-                StringBuilder sql = new StringBuilder("UPDATE users SET username = ?, email = ?, mobile = ?, is_admin = ?");
+                StringBuilder sql = new StringBuilder("UPDATE users SET username = ?, email = ?, mobile = ?, is_admin = ?, updated_at = NOW()");
                 if (password != null && !password.trim().isEmpty()) {
                     sql.append(", password = ?");
                 }
@@ -268,7 +272,7 @@ public class UserManageServlet extends HttpServlet {
                 stmt.setString(paramIndex++, username);
                 stmt.setString(paramIndex++, email);
                 stmt.setString(paramIndex++, mobile);
-                stmt.setInt(paramIndex++, isAdmin ? 1 : 0);
+                stmt.setBoolean(paramIndex++, isAdmin);
                 
                 if (password != null && !password.trim().isEmpty()) {
                     stmt.setString(paramIndex++, password);

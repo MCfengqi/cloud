@@ -78,50 +78,87 @@ function editUser(id) {
         });
 }
 
+// 将showContent改名为showUserContent并导出到全局
+window.showUserContent = function(contentType, event) {
+    if (contentType === 'userList') {
+        const content = `
+            <div class="toolbar-container">
+                <div class="button-container">
+                    <button class="btn btn-primary" onclick="window.addUser()">
+                        <span class="menu-icon">➕</span>添加用户
+                    </button>
+                </div>
+            </div>
+            <table class="table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>密码</th>
+                        <th>邮箱</th>
+                        <th>手机号</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" style="text-align: center;">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        
+        document.getElementById('contentBody').innerHTML = content;
+        document.getElementById('contentTitle').textContent = '用户管理';
+        window.loadUserList();
+    }
+};
+
 // 加载用户列表
-function loadUserList() {
-    console.log('Loading user list...');
-    const tbody = document.querySelector('#userTable tbody');
-    
+window.loadUserList = function() {
     fetch('UserManageServlet?action=list')
-        .then(response => {
-            console.log('Response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(users => {
-            console.log('Received users:', users);
+            console.log('Received users data:', users); // 添加调试日志
+            const tbody = document.querySelector('#userTable tbody');
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">没有用户数据</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">没有用户数据</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td>${user.id}</td>
-                    <td>${user.username}</td>
-                    <td>${user.password}</td>
-                    <td>${user.email || ''}</td>
-                    <td>${user.mobile || ''}</td>
-                    <td>${user.isAdmin ? '管理员' : '普通用户'}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-warning" onclick="editUser(${user.id})">
-                                <span class="menu-icon">✏️</span>编辑
-                            </button>
-                            <button class="btn btn-danger" onclick="deleteUser(${user.id})">
-                                <span class="menu-icon">🗑️</span>删除
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = users.map(user => {
+                console.log('Processing user:', user); // 添加调试日志
+                return `
+                    <tr>
+                        <td>${user.id || ''}</td>
+                        <td>${user.username || ''}</td>
+                        <td>${user.password || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>${user.mobile || ''}</td>
+                        <td>${user.created_at ? formatDate(user.created_at) : ''}</td>
+                        <td>${user.updated_at ? formatDate(user.updated_at) : ''}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button onclick="editUser(${user.id})" class="btn btn-warning">
+                                    <span class="menu-icon">✏️</span>编辑
+                                </button>
+                                <button onclick="deleteUser(${user.id})" class="btn btn-danger">
+                                    <span class="menu-icon">🗑️</span>删除
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         })
         .catch(error => {
             console.error('Error:', error);
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">
-                加载失败: ${error.message}</td></tr>`;
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">加载失败</td></tr>';
         });
-}
+};
 
 // 搜索用户
 function searchUsers() {
@@ -174,15 +211,21 @@ function updateUser(event, id) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    
     const data = {
-        id: id,
         action: 'update',
+        id: id,
         username: formData.get('username'),
         password: formData.get('password'),
         email: formData.get('email'),
         mobile: formData.get('mobile'),
-        isAdmin: formData.get('userType') === '1'
+        is_admin: formData.get('userType') === '1'
     };
+    
+    // 如果密码为空，则不更新密码
+    if (!data.password) {
+        delete data.password;
+    }
     
     fetch('UserManageServlet', {
         method: 'POST',
@@ -218,6 +261,7 @@ function submitAddUser(event) {
     const password = formData.get('password').trim();
     const email = formData.get('email').trim();
     const mobile = formData.get('mobile').trim();
+    const isAdmin = formData.get('userType') === '1';
     
     if (!username || !password || !email || !mobile) {
         alert('请填写所有必填字段');
@@ -230,7 +274,7 @@ function submitAddUser(event) {
         password: password,
         email: email,
         mobile: mobile,
-        isAdmin: formData.get('userType') === '1'
+        is_admin: isAdmin
     };
     
     console.log('Submitting user data:', data);
@@ -261,4 +305,44 @@ function submitAddUser(event) {
         console.error('Error:', error);
         alert('系统错误：' + error.message);
     });
-} 
+}
+
+// 确保所有函数都导出到全局作用域
+window.addUser = addUser;
+window.editUser = editUser;
+window.deleteUser = deleteUser;
+window.updateUser = updateUser;
+window.submitAddUser = submitAddUser;
+window.searchUsers = searchUsers;
+
+// 添加日期格式化函数
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        // 尝试解析日期字符串
+        const date = new Date(dateString);
+        
+        // 检查日期是否有效
+        if (isNaN(date.getTime())) {
+            console.warn('Invalid date:', dateString);
+            return dateString;
+        }
+        
+        // 格式化日期
+        return new Intl.DateTimeFormat('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).format(date);
+    } catch (e) {
+        console.error('Date formatting error:', e);
+        return dateString;
+    }
+}
+
+// 导出日期格式化函数到全局
+window.formatDate = formatDate; 

@@ -10,11 +10,9 @@
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -22,16 +20,12 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024, // 1 MB
-    maxFileSize = 1024 * 1024 * 10,  // 10 MB
-    maxRequestSize = 1024 * 1024 * 15 // 15 MB
-)
 public class GameManageServlet extends HttpServlet {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
     private static final String USER = "cloudcity";
     private static final String PASS = "cloudcity";
-    private static final String UPLOAD_DIR = "game_images";
+
+    private final Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -60,18 +54,30 @@ public class GameManageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        String action = request.getParameter("action");
-
+        
         try {
+            // 读取JSON数据
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = request.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            
+            // 解析JSON数据
+            JsonObject jsonData = gson.fromJson(sb.toString(), JsonObject.class);
+            String action = jsonData.get("action").getAsString();
+
             switch (action) {
                 case "add":
-                    addGame(request, response);
+                    addGame(jsonData, response);
                     break;
                 case "update":
-                    updateGame(request, response);
+                    updateGame(jsonData, response);
                     break;
                 case "delete":
-                    deleteGame(request, response);
+                    deleteGame(jsonData, response);
                     break;
                 default:
                     sendError(response, "Unknown action: " + action);
@@ -102,7 +108,10 @@ public class GameManageServlet extends HttpServlet {
             }
         }
         
-        new Gson().toJson(games, response.getWriter());
+        // 添加调试日志
+        System.out.println("Games data: " + new Gson().toJson(games));
+        
+        response.getWriter().write(new Gson().toJson(games));
     }
 
     private void getGame(HttpServletRequest request, HttpServletResponse response) 
@@ -132,17 +141,12 @@ public class GameManageServlet extends HttpServlet {
         }
     }
 
-    private void addGame(HttpServletRequest request, HttpServletResponse response) 
-            throws SQLException, IOException, ServletException {
-        // 获取表单数据
-        String gamename = request.getParameter("gamename");
-        String gametxt = request.getParameter("gametxt");
-        String gamelink = request.getParameter("gamelink");
-        
-        // 处理图片上传
-        Part filePart = request.getPart("gameimg");
-        String fileName = getSubmittedFileName(filePart);
-        String gameimg = saveFile(filePart, fileName);
+    private void addGame(JsonObject jsonData, HttpServletResponse response) 
+            throws SQLException, IOException {
+        String gamename = jsonData.get("gamename").getAsString();
+        String gameimg = jsonData.get("gameimg").getAsString();
+        String gametxt = jsonData.get("gametxt").getAsString();
+        String gamelink = jsonData.get("gamelink").getAsString();
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement stmt = conn.prepareStatement(
@@ -159,87 +163,55 @@ public class GameManageServlet extends HttpServlet {
         }
     }
 
-    private void updateGame(HttpServletRequest request, HttpServletResponse response) 
-            throws SQLException, IOException, ServletException {
-        long gameId = Long.parseLong(request.getParameter("id"));
-        String gamename = request.getParameter("gamename");
-        String gametxt = request.getParameter("gametxt");
-        String gamelink = request.getParameter("gamelink");
-        
-        StringBuilder sql = new StringBuilder("UPDATE gamelist SET gamename = ?, gametxt = ?, gamelink = ?");
-        
-        // 检查是否有新图片上传
-        Part filePart = request.getPart("gameimg");
-        String gameimg = null;
-        if (filePart != null && filePart.getSize() > 0) {
-            String fileName = getSubmittedFileName(filePart);
-            gameimg = saveFile(filePart, fileName);
-            sql.append(", gameimg = ?");
-        }
-        
-        sql.append(", updated_at = NOW() WHERE gameid = ?");
+    private void updateGame(JsonObject jsonData, HttpServletResponse response) 
+            throws SQLException, IOException {
+        long gameId = jsonData.get("id").getAsLong();
+        String gamename = jsonData.get("gamename").getAsString();
+        String gameimg = jsonData.get("gameimg").getAsString();
+        String gametxt = jsonData.get("gametxt").getAsString();
+        String gamelink = jsonData.get("gamelink").getAsString();
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE gamelist SET gamename = ?, gameimg = ?, gametxt = ?, " +
+                     "gamelink = ?, updated_at = NOW() WHERE gameid = ?")) {
             
-            int paramIndex = 1;
-            stmt.setString(paramIndex++, gamename);
-            stmt.setString(paramIndex++, gametxt);
-            stmt.setString(paramIndex++, gamelink);
-            if (gameimg != null) {
-                stmt.setString(paramIndex++, gameimg);
-            }
-            stmt.setLong(paramIndex, gameId);
+            stmt.setString(1, gamename);
+            stmt.setString(2, gameimg);
+            stmt.setString(3, gametxt);
+            stmt.setString(4, gamelink);
+            stmt.setLong(5, gameId);
             
             int result = stmt.executeUpdate();
             sendSuccess(response, result > 0);
         }
     }
 
-    private void deleteGame(HttpServletRequest request, HttpServletResponse response) 
+    private void deleteGame(JsonObject jsonData, HttpServletResponse response) 
             throws SQLException, IOException {
-        long gameId = Long.parseLong(request.getParameter("id"));
+        long gameId = jsonData.get("id").getAsLong();
         
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
              PreparedStatement stmt = conn.prepareStatement("DELETE FROM gamelist WHERE gameid = ?")) {
             
             stmt.setLong(1, gameId);
             int result = stmt.executeUpdate();
-            sendSuccess(response, result > 0);
-        }
-    }
-
-    private String saveFile(Part filePart, String fileName) throws IOException {
-        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdir();
-        }
-
-        String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-        String filePath = uploadPath + File.separator + uniqueFileName;
-        
-        try (InputStream input = filePart.getInputStream();
-             OutputStream output = new FileOutputStream(filePath)) {
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = input.read(buffer)) > 0) {
-                output.write(buffer, 0, length);
+            
+            JsonObject response_data = new JsonObject();
+            if (result > 0) {
+                response_data.addProperty("success", true);
+                response_data.addProperty("message", "游戏删除成功");
+            } else {
+                response_data.addProperty("success", false);
+                response_data.addProperty("error", "未找到要删除的游戏");
             }
+            response.getWriter().write(gson.toJson(response_data));
+        } catch (SQLException e) {
+            JsonObject error_response = new JsonObject();
+            error_response.addProperty("success", false);
+            error_response.addProperty("error", "删除游戏时发生错误: " + e.getMessage());
+            response.getWriter().write(gson.toJson(error_response));
         }
-        
-        return UPLOAD_DIR + "/" + uniqueFileName;
-    }
-
-    private String getSubmittedFileName(Part part) {
-        String header = part.getHeader("content-disposition");
-        if (header == null) return null;
-        for (String token : header.split(";")) {
-            if (token.trim().startsWith("filename")) {
-                return token.substring(token.indexOf('=') + 1).trim().replace("\"", "");
-            }
-        }
-        return null;
     }
 
     private void sendError(HttpServletResponse response, String message) throws IOException {

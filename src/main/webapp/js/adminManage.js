@@ -1,41 +1,84 @@
-function loadAdminList() {
-    const tbody = document.querySelector('#adminTable tbody');
-    
-    fetch('AdminListServlet')
+// 将showContent改名为showAdminContent并导出到全局
+window.showAdminContent = function(contentType, event) {
+    if (contentType === 'adminList') {
+        const content = `
+            <div class="toolbar-container">
+                <div class="button-container">
+                    <button class="btn btn-primary" onclick="window.addAdmin()">
+                        <span class="menu-icon">➕</span>添加管理员
+                    </button>
+                </div>
+            </div>
+            <table class="table" id="adminTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>管理员名</th>
+                        <th>密码</th>
+                        <th>邮箱</th>
+                        <th>手机号</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" style="text-align: center;">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        
+        document.getElementById('contentBody').innerHTML = content;
+        document.getElementById('contentTitle').textContent = '管理员管理';
+        window.loadAdminList();
+    }
+};
+
+// 加载管理员列表
+window.loadAdminList = function() {
+    fetch('AdminListServlet?action=list')
         .then(response => response.json())
         .then(admins => {
+            console.log('Received admins data:', admins); // 添加调试日志
+            const tbody = document.querySelector('#adminTable tbody');
             if (admins.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">暂无管理员数据</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">没有管理员数据</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = admins.map(admin => `
-                <tr>
-                    <td>${admin.id}</td>
-                    <td>${admin.username}</td>
-                    <td>${admin.email || ''}</td>
-                    <td>${admin.mobile || ''}</td>
-                    <td>${admin.online ? '在线' : '离线'}</td>
-                    <td>${admin.lastLoginTime || ''}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-warning" onclick="editAdmin(${admin.id})">
-                                <span class="menu-icon">✏️</span>编辑
-                            </button>
-                            <button class="btn btn-danger" onclick="deleteAdmin(${admin.id})">
-                                <span class="menu-icon">🗑️</span>删除
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = admins.map(admin => {
+                console.log('Processing admin:', admin); // 添加调试日志
+                return `
+                    <tr>
+                        <td>${admin.id || ''}</td>
+                        <td>${admin.username || ''}</td>
+                        <td>${admin.password || ''}</td>
+                        <td>${admin.email || ''}</td>
+                        <td>${admin.mobile || ''}</td>
+                        <td>${admin.created_at ? formatDate(admin.created_at) : ''}</td>
+                        <td>${admin.updated_at ? formatDate(admin.updated_at) : ''}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button onclick="editAdmin(${admin.id})" class="btn btn-warning">
+                                    <span class="menu-icon">✏️</span>编辑
+                                </button>
+                                <button onclick="deleteAdmin(${admin.id})" class="btn btn-danger">
+                                    <span class="menu-icon">🗑️</span>删除
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         })
         .catch(error => {
             console.error('Error:', error);
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">
-                加载失败: ${error.message}</td></tr>`;
+            const tbody = document.querySelector('#adminTable tbody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">加载失败</td></tr>';
         });
-}
+};
 
 function addAdmin() {
     const content = `
@@ -216,4 +259,29 @@ function submitEditAdmin(event, id) {
         console.error('Error:', error);
         alert('系统错误：' + error.message);
     });
-} 
+}
+
+// 确保所有函数都导出到全局作用域
+window.addAdmin = addAdmin;
+window.editAdmin = editAdmin;
+window.deleteAdmin = deleteAdmin;
+window.submitAddAdmin = submitAddAdmin;
+window.submitEditAdmin = submitEditAdmin;
+window.searchAdmins = searchAdmins;
+
+// 添加日期格式化函数
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+// 导出日期格式化函数到全局
+window.formatDate = formatDate; 

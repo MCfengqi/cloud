@@ -44,9 +44,7 @@ public class AdminListServlet extends HttpServlet {
                 // 获取单个管理员信息
                 Long id = Long.parseLong(request.getParameter("id"));
                 try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
-                    String sql = "SELECT id, username, email, mobile, is_admin, " +
-                               "created_at as last_login_time " +
-                               "FROM users WHERE id = ? AND is_admin = 1";
+                    String sql = "SELECT * FROM users WHERE id = ? AND is_admin = 1";
                                
                     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                         stmt.setLong(1, id);
@@ -56,12 +54,16 @@ public class AdminListServlet extends HttpServlet {
                             JsonObject admin = new JsonObject();
                             admin.addProperty("id", rs.getLong("id"));
                             admin.addProperty("username", rs.getString("username"));
+                            admin.addProperty("password", rs.getString("password"));
                             admin.addProperty("email", rs.getString("email"));
                             admin.addProperty("mobile", rs.getString("mobile"));
                             admin.addProperty("isAdmin", rs.getBoolean("is_admin"));
-                            admin.addProperty("lastLoginTime", 
-                                rs.getTimestamp("last_login_time") != null ? 
-                                rs.getTimestamp("last_login_time").toString() : null);
+                            admin.addProperty("created_at", 
+                                rs.getTimestamp("created_at") != null ? 
+                                rs.getTimestamp("created_at").toString() : null);
+                            admin.addProperty("updated_at", 
+                                rs.getTimestamp("updated_at") != null ? 
+                                rs.getTimestamp("updated_at").toString() : null);
                             
                             response.getWriter().write(admin.toString());
                         } else {
@@ -73,10 +75,39 @@ public class AdminListServlet extends HttpServlet {
                 }
             } else {
                 // 获取管理员列表
-                List<Admin> adminList = adminService.getOnlineAdmins();
-                Gson gson = new Gson();
-                String jsonResponse = gson.toJson(adminList);
-                response.getWriter().write(jsonResponse);
+                try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+                    String sql = "SELECT * FROM users WHERE is_admin = 1";
+                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                        ResultSet rs = stmt.executeQuery();
+                        
+                        StringBuilder jsonBuilder = new StringBuilder();
+                        jsonBuilder.append("[");
+                        boolean first = true;
+                        
+                        while (rs.next()) {
+                            if (!first) {
+                                jsonBuilder.append(",");
+                            }
+                            first = false;
+                            
+                            jsonBuilder.append("{")
+                                .append("\"id\":").append(rs.getLong("id")).append(",")
+                                .append("\"username\":\"").append(escapeJson(rs.getString("username"))).append("\",")
+                                .append("\"password\":\"").append(escapeJson(rs.getString("password"))).append("\",")
+                                .append("\"email\":\"").append(escapeJson(rs.getString("email"))).append("\",")
+                                .append("\"mobile\":\"").append(escapeJson(rs.getString("mobile"))).append("\",")
+                                .append("\"created_at\":\"").append(rs.getTimestamp("created_at") != null ? 
+                                    rs.getTimestamp("created_at").toString() : "").append("\",")
+                                .append("\"updated_at\":\"").append(rs.getTimestamp("updated_at") != null ? 
+                                    rs.getTimestamp("updated_at").toString() : "").append("\",")
+                                .append("\"isAdmin\":true")
+                                .append("}");
+                        }
+                        
+                        jsonBuilder.append("]");
+                        response.getWriter().write(jsonBuilder.toString());
+                    }
+                }
             }
         } catch (Exception e) {
             System.err.println("AdminListServlet错误: " + e.getMessage());
@@ -146,5 +177,19 @@ public class AdminListServlet extends HttpServlet {
             result.addProperty("error", e.getMessage());
             response.getWriter().write(result.toString());
         }
+    }
+
+    // 添加 escapeJson 方法
+    private String escapeJson(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\b", "\\b")
+                    .replace("\f", "\\f")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t");
     }
 }

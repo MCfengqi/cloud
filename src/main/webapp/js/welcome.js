@@ -21,156 +21,35 @@ function toggleSubmenu(submenuId) {
     }
 }
 
-async function showContent(type, event) {
-    console.log('showContent called with type:', type);
-    console.log('Event:', event);
-    
+async function showContent(contentType, event) {
     if (event) {
-        event.stopPropagation();
+        event.preventDefault();
     }
+    console.log('showContent called with type:', contentType);
+    console.log('Event:', event);
 
-    const contentTitle = document.getElementById('contentTitle');
-    const contentBody = document.getElementById('contentBody');
-
-    if (!contentTitle || !contentBody) {
-        console.error('Required elements not found:');
-        console.error('contentTitle:', contentTitle);
-        console.error('contentBody:', contentBody);
-        return;
-    }
-
-    try {
-        switch (type) {
-            case 'userList':
-                contentTitle.textContent = '用户管理';
-                contentBody.innerHTML = `
-                    <div class="content-wrapper">
-                        <div class="toolbar-container">
-                            <div class="search-container">
-                                <input type="text" id="userSearchInput" placeholder="请输入要搜索的用户信息...">
-                            </div>
-                            <div class="button-container">
-                                <button class="btn btn-primary" onclick="searchUsers()">
-                                    <span class="menu-icon">🔍</span>搜索
-                                </button>
-                                <button class="btn btn-primary" onclick="addUser()">
-                                    <span class="menu-icon">➕</span>添加用户
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="userTable" class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>用户名</th>
-                                        <th>密码</th>
-                                        <th>邮箱</th>
-                                        <th>手机号</th>
-                                        <th>用户类型</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="7" style="text-align: center;">加载中...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-                loadUserList();
-                break;
-                
-            case 'adminList':
-                contentTitle.textContent = '管理员管理';
-                contentBody.innerHTML = `
-                    <div class="content-wrapper">
-                        <div class="toolbar">
-                            <button class="btn btn-primary" onclick="addAdmin()">
-                                <span class="menu-icon">➕</span>添加管理员
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="adminTable" class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>管理员名称</th>
-                                        <th>邮箱</th>
-                                        <th>手机号</th>
-                                        <th>状态</th>
-                                        <th>最后登录时间</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="7" style="text-align: center;">加载中...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-                loadAdminList();
-                break;
-                
-            case 'contentManage':
-                try {
-                    console.log('Loading content management...');
-                    contentTitle.textContent = '内容管理';
-                    contentBody.innerHTML = `
-                        <div class="content-wrapper">
-                            <div class="toolbar">
-                                <button class="btn btn-primary" onclick="addGame()">
-                                    <span class="menu-icon">➕</span>添加游戏
-                                </button>
-                            </div>
-                            <div class="table-responsive">
-                                <table id="gameTable" class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>游戏ID</th>
-                                            <th>游戏名称</th>
-                                            <th>游戏图片</th>
-                                            <th>游戏描述</th>
-                                            <th>游戏链接</th>
-                                            <th>创建时间</th>
-                                            <th>更新时间</th>
-                                            <th>操作</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="8" style="text-align: center;">加载中...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    `;
-                    console.log('Content management HTML set up, loading game list...');
-                    if (typeof loadGameList === 'function') {
-                        loadGameList();
-                    } else {
-                        console.error('loadGameList function is not defined');
-                        throw new Error('loadGameList function is not defined');
-                    }
-                } catch (error) {
-                    console.error('Error in content management:', error);
-                    contentBody.innerHTML = `<div class="error">加载内容管理失败: ${error.message}</div>`;
-                }
-                break;
-                
-            default:
-                contentTitle.textContent = '欢迎使用';
-                contentBody.innerHTML = '<h3>欢迎使用云城游戏管理系统</h3>';
-        }
-    } catch (error) {
-        console.error('Error loading content:', error);
-        contentBody.innerHTML = '<p class="error">加载内容时发生错误</p>';
+    // 清除其他内容
+    document.getElementById('contentBody').innerHTML = '';
+    
+    switch(contentType) {
+        case 'contentManage':
+            console.log('Loading content management...');
+            if (typeof window.showGameContent === 'function') {
+                window.showGameContent(contentType, event);
+            }
+            break;
+        case 'userList':
+            console.log('Loading user management...');
+            if (typeof window.showUserContent === 'function') {
+                window.showUserContent(contentType, event);
+            }
+            break;
+        case 'adminList':
+            console.log('Loading admin management...');
+            if (typeof window.showAdminContent === 'function') {
+                window.showAdminContent(contentType, event);
+            }
+            break;
     }
 }
 
@@ -196,3 +75,6 @@ window.onclick = function(event) {
         modal.style.display = 'none';
     }
 }
+
+// 将 showContent 函数导出到全局作用域
+window.showContent = showContent;

@@ -392,7 +392,7 @@
         <div class="sidebar">
             <div class="system-title">
                 <span class="logo">🎮</span>
-                <h1>云城游戏管理系统</h1>
+                <h1>云城游戏管理统</h1>
             </div>
 
             <div class="menu-container">
@@ -407,12 +407,12 @@
                             <span class="dropdown-icon">▼</span>
                         </div>
                         <ul class="submenu" id="systemManage">
-                            <li class="submenu-item" onclick="showContent('userList', event)">
+                            <li class="submenu-item" onclick="window.showContent('userList', event)">
                                 <span class="menu-icon">👥</span>
                                 <span>用户管理</span>
                             </li>
                             <% if (isAdmin != null && isAdmin) { %>
-                                <li class="submenu-item" onclick="showContent('adminList', event)">
+                                <li class="submenu-item" onclick="window.showContent('adminList', event)">
                                     <span class="menu-icon">👤</span>
                                     <span>管理员管理</span>
                                 </li>
@@ -428,7 +428,7 @@
                             <span class="dropdown-icon">▼</span>
                         </div>
                         <ul class="submenu" id="gameManage">
-                            <li class="submenu-item" onclick="showContent('contentManage', event)">
+                            <li class="submenu-item" onclick="window.showContent('contentManage', event)">
                                 <span class="menu-icon">📝</span>
                                 <span>内容管理</span>
                             </li>
@@ -485,7 +485,7 @@
         </div>
     </div>
 
-    <!-- 引入外部JavaScript文件 -->
+    <!-- 修改脚本引入顺序 -->
     <script src="js/welcome.js"></script>
     <script src="js/userManage.js"></script>
     <script src="js/adminManage.js"></script>
