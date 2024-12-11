@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 25/11/2024 08:27:44
+ Date: 09/12/2024 07:50:49
 */
 
 SET NAMES utf8mb4;
@@ -35,12 +35,12 @@ CREATE TABLE `users`  (
   INDEX `idx_username`(`username` ASC) USING BTREE COMMENT '用户名索引',
   INDEX `idx_email`(`email` ASC) USING BTREE COMMENT '邮箱索引',
   INDEX `idx_mobile`(`mobile` ASC) USING BTREE COMMENT '手机号索引'
-) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, 'adminFQ', '123456', 'qxsj@vip.qq.com', '15529400971', 1, '2024-11-10 10:25:08', '2024-11-25 08:02:51');
+INSERT INTO `users` VALUES (1, 'adminFQ', '123456', 'qxsj@vip.qq.com', '15529400971', 1, '2024-11-10 10:25:08', '2024-12-08 21:11:38');
 INSERT INTO `users` VALUES (3, 'test', '123', 'mcfengqi123@2925.com', '15529400972', 0, '2024-11-10 11:10:48', '2024-11-10 16:44:33');
 INSERT INTO `users` VALUES (5, '123456', '111111', 'mcfengqi123@2925.com', '15529400973', 1, '2024-11-10 12:49:12', '2024-11-10 16:43:32');
 INSERT INTO `users` VALUES (14, 'adminQF', '123456', 'mcfengqi123@2925.com', '15529400972', 1, '2024-11-10 16:44:53', '2024-11-10 16:44:53');
@@ -48,7 +48,9 @@ INSERT INTO `users` VALUES (18, 'yonghu123', '123456', 'qxsj@vip.qq.com', '15529
 INSERT INTO `users` VALUES (19, '666666', '123456', 'q@qq.com', 'q@qq.com', 0, '2024-11-19 20:50:20', '2024-11-19 20:50:20');
 INSERT INTO `users` VALUES (20, 'q@qq.com', 'q@qq.com', 'q@qq.com', 'q@qq.com', 0, '2024-11-19 20:50:39', '2024-11-19 20:50:39');
 INSERT INTO `users` VALUES (21, 'admin1', '123456', 'admin1@qq.cpm', 'admin1', 1, '2024-11-19 20:58:02', '2024-11-19 21:23:45');
-INSERT INTO `users` VALUES (22, 'yonghu1', 'yonghu1', 'yonghu1@qq.com', 'yonghu1', 0, '2024-11-19 21:23:09', '2024-11-19 21:23:09');
 INSERT INTO `users` VALUES (24, 'admini222', '123456', 'yonghu1@qq.com', 'yonghu1@qq.com', 1, '2024-11-19 21:23:37', '2024-11-19 21:23:37');
+INSERT INTO `users` VALUES (25, 'aaaa', '123456', 'yonghu1@qq.com', 'yonghu1@qq.com', 0, '2024-11-27 12:47:39', '2024-11-27 12:47:39');
+INSERT INTO `users` VALUES (26, '2626', '2626', 'yonghu1@qq.com', 'yonghu1@qq.com', 0, '2024-11-27 13:05:03', '2024-11-27 13:07:27');
+INSERT INTO `users` VALUES (27, 'adminyc', 'DXC258079', 'qxsj@vip.qq.com', '15529400972', 0, '2024-12-06 11:39:43', '2024-12-06 11:39:58');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -392,12 +392,22 @@
         <div class="sidebar">
             <div class="system-title">
                 <span class="logo">🎮</span>
-                <h1>云城游戏管理统</h1>
+                <h1>云城游戏管理系统</h1>
             </div>
 
             <div class="menu-container">
                 <!-- 菜单部分 -->
                 <ul class="menu">
+                    <!-- 添加管理员列表菜单项 -->
+                    <li class="menu-item">
+                        <div class="menu-item-wrapper" onclick="window.showContent('adminList', event)">
+                            <div class="menu-item-content">
+                                <span class="menu-icon">👑</span>
+                                <span>管理员列表</span>
+                            </div>
+                        </div>
+                    </li>
+                    
                     <li class="menu-item">
                         <div class="menu-item-wrapper" onclick="toggleSubmenu('systemManage')">
                             <div class="menu-item-content">
@@ -411,12 +421,10 @@
                                 <span class="menu-icon">👥</span>
                                 <span>用户管理</span>
                             </li>
-                            <% if (isAdmin != null && isAdmin) { %>
-                                <li class="submenu-item" onclick="window.showContent('adminList', event)">
-                                    <span class="menu-icon">👤</span>
-                                    <span>管理员管理</span>
-                                </li>
-                            <% } %>
+                            <li class="submenu-item" onclick="window.showContent('logList', event)">
+                                <span class="menu-icon">📋</span>
+                                <span>日志查询</span>
+                            </li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -476,7 +484,7 @@
         <!-- 右侧内容区域 -->
         <div class="content">
             <div class="content-header">
-                <h2 id="contentTitle">系统管理</h2>
+                <h2 id="contentTitle">云城游戏管理系统</h2>
             </div>
             <div class="content-body" id="contentBody">
                 <!-- 初始内容 -->
@@ -498,6 +506,7 @@
     <script src="js/userManage.js"></script>
     <script src="js/adminManage.js"></script>
     <script src="js/gameManage.js"></script>
+    <script src="js/logManage.js"></script>
     
     <%
         } catch (Exception e) {
@@ -505,5 +514,22 @@
             System.err.println("Error in welcome.jsp: " + e.getMessage());
         }
     %>
+
+    <!-- 页脚
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 云城游戏门户. All rights reserved.</p>
+            <p>
+                <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
+                    陕ICP备2024054614号
+                </a>
+                &nbsp;|&nbsp;
+                <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
+                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
+                    陕公网安备61019102000653
+                </a>
+            </p>
+        </div>
+    </footer> -->
 </body>
 </html>

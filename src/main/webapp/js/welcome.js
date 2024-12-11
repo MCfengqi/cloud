@@ -50,6 +50,12 @@ async function showContent(contentType, event) {
                 window.showAdminContent(contentType, event);
             }
             break;
+        case 'logList':
+            console.log('Loading log management...');
+            if (typeof window.showLogContent === 'function') {
+                window.showLogContent(contentType, event);
+            }
+            break;
     }
 }
 

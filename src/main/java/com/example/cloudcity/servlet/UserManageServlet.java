@@ -21,7 +21,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 
-public class UserManageServlet extends HttpServlet {
+public class
+UserManageServlet extends HttpServlet {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
     private static final String USER = "cloudcity";
     private static final String PASS = "cloudcity";

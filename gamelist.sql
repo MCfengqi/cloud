@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 25/11/2024 08:23:39
+ Date: 09/12/2024 07:50:40
 */
 
 SET NAMES utf8mb4;
@@ -31,16 +31,16 @@ CREATE TABLE `gamelist`  (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`gameid`) USING BTREE,
   INDEX `idx_gamename`(`gamename` ASC) USING BTREE COMMENT '游戏名称索引'
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '游戏列表信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '游戏列表信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of gamelist
 -- ----------------------------
-INSERT INTO `gamelist` VALUES (4, '测试游戏', 'game_images/1732017249501_Image_70188365081349.jpg', 'ceshi', 'https://www.baidu.com', '2024-11-19 19:54:10', '2024-11-19 19:54:10');
-INSERT INTO `gamelist` VALUES (5, '测试游戏1', 'game_images/1732017445064_Image_70188365081349.jpg', 'https://www.baidu.com', 'https://www.baidu.com', '2024-11-19 19:57:25', '2024-11-19 19:57:25');
-INSERT INTO `gamelist` VALUES (6, '测试游戏2', 'game_images/1732017458795_Image_70188365081349.jpg', 'https://www.baidu.com', 'https://www.baidu.com', '2024-11-19 19:57:38', '2024-11-19 19:57:38');
-INSERT INTO `gamelist` VALUES (7, 'https://www.baidu.com', 'game_images/1732017474564_Image_70188365081349.jpg', 'https://www.baidu.com', 'https://www.baidu.com', '2024-11-19 19:57:54', '2024-11-19 19:57:54');
-INSERT INTO `gamelist` VALUES (8, 'https://www.baidu.com', 'game_images/1732017485824_Image_70188365081349.jpg', 'https://www.baidu.com', 'https://www.baidu.com', '2024-11-19 19:58:05', '2024-11-19 19:58:05');
-INSERT INTO `gamelist` VALUES (9, 'gta5', 'game_images/1732018630903_R-C.jpg', '朱哲宇', 'http://cdn.u1.huluxia.com/g4/M01/80/54/rBAAdmc_7pqAJGCmAAGUks7-5H0489.jpg', '2024-11-19 20:17:11', '2024-11-22 10:38:45');
+INSERT INTO `gamelist` VALUES (12, '敢敢和奶龙', 'https://img.mcfengqi.icu/LightPicture/2024/12/31538f2058e5928a.jpg', '这是敢敢，首席宣传大使', 'https://img.mcfengqi.icu/LightPicture/2024/12/31538f2058e5928a.jpg', '2024-11-26 22:28:17', '2024-12-06 11:35:19');
+INSERT INTO `gamelist` VALUES (13, '小肚小肚', 'https://img.mcfengqi.icu/LightPicture/2024/12/47192fae4356cb49.png', '这是小肚小肚', 'https://img.mcfengqi.icu/LightPicture/2024/12/47192fae4356cb49.png', '2024-11-26 22:36:57', '2024-12-06 11:51:52');
+INSERT INTO `gamelist` VALUES (14, '苗', 'https://img.mcfengqi.icu/LightPicture/2024/12/ad81b155043e66ad.jpg', '这是苗', 'https://img.mcfengqi.icu/LightPicture/2024/12/ad81b155043e66ad.jpg', '2024-11-27 00:40:18', '2024-12-06 11:42:57');
+INSERT INTO `gamelist` VALUES (15, '糕糕', 'https://img.mcfengqi.icu/LightPicture/2024/12/989d786430a14afa.jpg', '这是糕糕', 'https://img.mcfengqi.icu/LightPicture/2024/12/989d786430a14afa.jpg', '2024-11-27 13:55:36', '2024-12-06 11:33:03');
+INSERT INTO `gamelist` VALUES (16, '宋小睿', 'https://img.mcfengqi.icu/LightPicture/2024/12/d3b164437abf8e16.jpg', '这是宋小睿', 'https://img.mcfengqi.icu/LightPicture/2024/11/7539d5c023a9d7b9.jpg', '2024-11-27 20:10:28', '2024-12-08 21:01:16');
+INSERT INTO `gamelist` VALUES (17, 'MC风启', 'https://img.mcfengqi.icu/LightPicture/2024/11/6066acbf4e8f949f.jpg', '这是一个介绍', 'https://img.mcfengqi.icu/LightPicture/2024/11/5577de0a24c7a2a4.jpg', '2024-11-27 20:10:28', '2024-12-06 11:26:19');
 
 SET FOREIGN_KEY_CHECKS = 1;

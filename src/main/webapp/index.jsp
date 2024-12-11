@@ -207,7 +207,8 @@
                 <a href="#games">游戏中心</a>
                 <a href="#news">新闻资讯</a>
                 <a href="#about">关于我们</a>
-                <a href="#contact">联系我们</a>
+                <a href="https://www.mcfengqi.icu/">我的网站</a>
+                <a href="https://img.mcfengqi.icu/">我的图床</a>
             </nav>
             <div class="auth-buttons">
                 <a href="login.jsp" class="login-btn">登录</a>
@@ -270,6 +271,16 @@
     <footer class="footer">
         <div class="footer-content">
             <p>© 2024 云城游戏门户. All rights reserved.</p>
+            <p>
+                <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
+                    陕ICP备2024054614号
+                </a>
+                &nbsp;|&nbsp;
+                <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
+                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
+                    陕公网安备61019102000653
+                </a>
+            </p>
         </div>
     </footer>
 </body>

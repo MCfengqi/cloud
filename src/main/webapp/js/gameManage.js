@@ -1,3 +1,16 @@
+/**
+ * 游戏管理前端JavaScript文件
+ * 用途：处理游戏管理界面的所有前端交互，包括：
+ * 1. 展示游戏列表界面
+ * 2. 处理游戏的添加操作
+ * 3. 处理游戏的编辑操作
+ * 4. 处理游戏的删除操作
+ * 5. 处理游戏图片预览和验证
+ * 6. 管理模态框的显示和隐藏
+ * 7. 处理表单提交和数据验证
+ * 8. 处理与后端的数据交互
+ */
+
 // 将showContent改名为showGameContent并导出到全局
 window.showGameContent = function(contentType, event) {
     if (contentType === 'contentManage') {
