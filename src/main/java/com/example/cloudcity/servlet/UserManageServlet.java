@@ -20,6 +20,7 @@ import java.util.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
+import com.example.cloudcity.utils.LogUtils;
 
 public class
 UserManageServlet extends HttpServlet {
@@ -75,10 +76,10 @@ UserManageServlet extends HttpServlet {
                 
                 switch (action) {
                     case "update":
-                        updateUser(jsonObject, response);
+                        updateUser(jsonObject, request, response);
                         break;
                     case "add":
-                        addUserFromJson(jsonObject, response);
+                        addUserFromJson(jsonObject, request, response);
                         break;
                     case "delete":
                         deleteUser(request, response);
@@ -172,7 +173,7 @@ UserManageServlet extends HttpServlet {
         }
     }
 
-    private void addUserFromJson(JsonObject jsonObject, HttpServletResponse response) 
+    private void addUserFromJson(JsonObject jsonObject, HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         System.out.println("Received data: " + jsonObject.toString());
         
@@ -207,6 +208,15 @@ UserManageServlet extends HttpServlet {
                 stmt.setBoolean(5, isAdmin);
                 
                 int result = stmt.executeUpdate();
+                if (result > 0) {
+                    LogUtils.logOperation(
+                        "添加用户",
+                        "添加用户: " + username,
+                        (String) request.getSession().getAttribute("username"),
+                        request,
+                        "成功"
+                    );
+                }
                 response.getWriter().write("{\"success\": " + (result > 0) + "}");
             }
         } catch (SQLException e) {
@@ -236,12 +246,21 @@ UserManageServlet extends HttpServlet {
                 stmt.setBoolean(5, isAdmin);
                 
                 int result = stmt.executeUpdate();
+                if (result > 0) {
+                    LogUtils.logOperation(
+                        "添加用户",
+                        "添加用户: " + username,
+                        (String) request.getSession().getAttribute("username"),
+                        request,
+                        "成功"
+                    );
+                }
                 response.getWriter().write("{\"success\": " + (result > 0) + "}");
             }
         }
     }
 
-    private void updateUser(JsonObject data, HttpServletResponse response) 
+    private void updateUser(JsonObject data, HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         try {
             long id = data.get("id").getAsLong();
@@ -282,6 +301,15 @@ UserManageServlet extends HttpServlet {
                 
                 // 执行更新
                 int result = stmt.executeUpdate();
+                if (result > 0) {
+                    LogUtils.logOperation(
+                        "更新用户",
+                        "更新用户: " + username,
+                        (String) request.getSession().getAttribute("username"),
+                        request,
+                        "成功"
+                    );
+                }
                 
                 System.out.println("Update result: " + result);
                 
@@ -312,6 +340,15 @@ UserManageServlet extends HttpServlet {
                 stmt.setLong(1, id);
                 
                 int result = stmt.executeUpdate();
+                if (result > 0) {
+                    LogUtils.logOperation(
+                        "删除用户",
+                        "删除用户ID: " + id,
+                        (String) request.getSession().getAttribute("username"),
+                        request,
+                        "成功"
+                    );
+                }
                 String jsonResponse = "{\"success\":" + (result > 0) + "}";
                 System.out.println("Delete response: " + jsonResponse);
                 response.getWriter().write(jsonResponse);

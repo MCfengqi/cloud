@@ -13,6 +13,7 @@ import java.sql.DriverManager; // 导入DriverManager类用于加载数据库驱
 import java.sql.PreparedStatement; // 导入PreparedStatement类用于预编译SQL语句
 import java.sql.ResultSet; // 导入ResultSet类用于存储查询结果
 import java.sql.SQLException; // 导入SQLException类用于处理SQL异常
+import com.example.cloudcity.utils.LogUtils; // 导入LogUtils类用于日志记录
 
 @WebServlet("/UserLoginServlet")
 public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类继承自HttpServlet
@@ -45,6 +46,14 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
 
                 System.out.println("Login successful - Username: " + username + ", IsAdmin: " + userInfo.isAdmin); // 打印登录成功信息
                 System.out.println("Session ID: " + session.getId()); // 打印会话ID
+
+                LogUtils.logOperation(
+                    "用户登录",
+                    "用户 " + username + " 登录系统",
+                    username,
+                    request,
+                    "成功"
+                );
 
                 response.sendRedirect("welcome.jsp"); // 重定向到欢迎页面
             } else {
@@ -83,7 +92,7 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
             Class.forName("com.mysql.cj.jdbc.Driver"); // 加载MySQL驱动
             conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
 
-            // 验证用户名和密码
+            // 验证用户名和��码
             String sql = "SELECT username, is_admin, updated_at FROM users WHERE username = ? AND password = ?";
             pstmt = conn.prepareStatement(sql); // 准备预编译SQL语句
             pstmt.setString(1, username); // 设置用户名参数
@@ -107,7 +116,7 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace(); // 打印堆栈跟踪信息
-            return null; // 返回null表示验证失败
+            return null; // 返回null表示验证失���
         } finally {
             try {
                 if (rs != null) rs.close(); // 关闭ResultSet

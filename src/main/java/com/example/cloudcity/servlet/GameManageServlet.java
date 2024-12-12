@@ -19,11 +19,12 @@ import com.google.gson.JsonObject; // 导入JsonObject类用于处理JSON对象
 import java.io.*; // 导入输入输出流相关类
 import java.sql.*; // 导入SQL相关类
 import java.util.*; // 导入集合框架相关类
+import com.example.cloudcity.utils.LogUtils;
 
 public class GameManageServlet extends HttpServlet { // 定义GameManageServlet类继承自HttpServlet
     // 数据库连接信息
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "cloudcity"; // 数据库用户名
+    private static final String USER = "cloudcity"; // 数据库���户名
     private static final String PASS = "cloudcity"; // 数据库密码
 
     // 创建Gson对象用于JSON处理
@@ -86,13 +87,13 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             // 根据action执行相应操作
             switch (action) {
                 case "add":
-                    addGame(jsonData, response); // 调用addGame方法添加新游戏
+                    addGame(jsonData, request, response); // 调用addGame方法添���新游戏
                     break;
                 case "update":
-                    updateGame(jsonData, response); // 调用updateGame方法更新游戏信息
+                    updateGame(jsonData, request, response); // 调用updateGame方法更新游戏信息
                     break;
                 case "delete":
-                    deleteGame(jsonData, response); // 调用deleteGame方法删除游戏
+                    deleteGame(jsonData, request, response); // 调用deleteGame方法删除游戏
                     break;
                 default:
                     sendError(response, "Unknown action: " + action); // 发送错误响应
@@ -172,9 +173,10 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
     /**
      * 添加新游戏
      * @param jsonData 游戏数据JSON对象
+     * @param request HTTP请求对象
      * @param response HTTP响应对象
      */
-    private void addGame(JsonObject jsonData, HttpServletResponse response)
+    private void addGame(JsonObject jsonData, HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         String gamename = jsonData.get("gamename").getAsString(); // 获取游戏名称
         String gameimg = jsonData.get("gameimg").getAsString(); // 获取游戏图片URL
@@ -192,6 +194,16 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             stmt.setString(4, gamelink); // 设置SQL插入参数
 
             int result = stmt.executeUpdate(); // 执行插入操作并获取受影响的行数
+            if (result > 0) {
+                // 添加日志记录
+                LogUtils.logOperation(
+                    "添加游戏",
+                    "添加游戏: " + gamename,
+                    (String) request.getSession().getAttribute("username"),
+                    request,
+                    "成功"
+                );
+            }
             sendSuccess(response, result > 0); // 发送成功响应
         }
     }
@@ -199,9 +211,10 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
     /**
      * 更新游戏信息
      * @param jsonData 游戏数据JSON对象
+     * @param request HTTP请求对象
      * @param response HTTP响应对象
      */
-    private void updateGame(JsonObject jsonData, HttpServletResponse response)
+    private void updateGame(JsonObject jsonData, HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         long gameId = jsonData.get("id").getAsLong(); // 获取游戏ID
         String gamename = jsonData.get("gamename").getAsString(); // 获取游戏名称
@@ -221,6 +234,16 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             stmt.setLong(5, gameId); // 设置SQL更新参数
 
             int result = stmt.executeUpdate(); // 执行更新操作并获取受影响的行数
+            if (result > 0) {
+                // 添加日志记录
+                LogUtils.logOperation(
+                    "更新游戏",
+                    "更新游戏: " + gamename,
+                    (String) request.getSession().getAttribute("username"),
+                    request,
+                    "成功"
+                );
+            }
             sendSuccess(response, result > 0); // 发送成功响应
         }
     }
@@ -228,9 +251,10 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
     /**
      * 删除游戏
      * @param jsonData 游戏数据JSON对象
+     * @param request HTTP请求对象
      * @param response HTTP响应对象
      */
-    private void deleteGame(JsonObject jsonData, HttpServletResponse response)
+    private void deleteGame(JsonObject jsonData, HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         long gameId = jsonData.get("id").getAsLong(); // 获取游戏ID
 
@@ -242,6 +266,14 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
 
             JsonObject response_data = new JsonObject(); // 创建JsonObject存储响应数据
             if (result > 0) {
+                // 添加日志记录
+                LogUtils.logOperation(
+                    "删除游戏",
+                    "删除游戏ID: " + gameId,
+                    (String) request.getSession().getAttribute("username"),
+                    request,
+                    "成功"
+                );
                 response_data.addProperty("success", true); // 设置成功标志
                 response_data.addProperty("message", "游戏删除成功"); // 设置成功消息
             } else {

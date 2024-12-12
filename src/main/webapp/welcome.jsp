@@ -19,26 +19,26 @@
             margin: 0;
             transition: all 0.3s ease;
         }
-        
+
         .submenu.active {
             display: block !important;
         }
-        
+
         .submenu-item {
             padding: 8px 15px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
+
         .submenu-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         .menu-item {
             list-style: none;
             margin: 5px 0;
         }
-        
+
         .menu-item-wrapper {
             padding: 10px;
             cursor: pointer;
@@ -46,36 +46,36 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .menu-item-content {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .menu-icon {
             margin-right: 8px;
         }
-        
+
         .dropdown-icon {
             transition: transform 0.3s ease;
         }
-        
+
         .menu-item-wrapper.active .dropdown-icon {
             transform: rotate(180deg);
         }
-        
+
         .content-wrapper {
             padding: 20px;
         }
-        
+
         .table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 1rem;
             background-color: #fff;
         }
-        
+
         .table th,
         .table td {
             padding: 12px;
@@ -83,16 +83,16 @@
             border: 1px solid #dee2e6;
             vertical-align: middle;
         }
-        
+
         .table th {
             background-color: #f8f9fa;
             font-weight: bold;
         }
-        
+
         .table tbody tr:nth-of-type(odd) {
             background-color: rgba(0, 0, 0, .05);
         }
-        
+
         .btn {
             padding: 5px 10px;
             margin: 2px;
@@ -100,11 +100,11 @@
             border: none;
             border-radius: 3px;
         }
-        
+
         .btn-primary { background-color: #007bff; color: white; }
         .btn-warning { background-color: #ffc107; color: black; }
         .btn-danger { background-color: #dc3545; color: white; }
-        
+
         /* 模态框样式 */
         .modal {
             display: none;
@@ -115,7 +115,7 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
         }
-        
+
         .modal-content {
             background-color: white;
             margin: 15% auto;
@@ -124,26 +124,26 @@
             max-width: 500px;
             border-radius: 5px;
         }
-        
+
         .close-btn {
             float: right;
             cursor: pointer;
             font-size: 20px;
         }
-        
+
         /* 修改菜单和子菜单的样式 */
         .menu {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .menu-item {
             list-style: none;
             margin: 5px 0;
             position: relative; /* 添加相对定位 */
         }
-        
+
         .menu-item-wrapper {
             padding: 10px;
             cursor: pointer;
@@ -153,17 +153,17 @@
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 4px;
         }
-        
+
         .menu-item-wrapper:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         .menu-item-content {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         /* 子菜单样式 */
         .submenu {
             display: none;
@@ -176,13 +176,13 @@
             transition: max-height 0.3s ease-out;
             max-height: 0;
         }
-        
+
         .submenu.active {
             display: block !important;
             max-height: 200px; /* 设置一个足够大的高度 */
             margin-top: 5px;
         }
-        
+
         .submenu-item {
             padding: 10px 20px 10px 40px;
             cursor: pointer;
@@ -191,26 +191,26 @@
             display: flex;
             align-items: center;
         }
-        
+
         .submenu-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         .menu-icon {
             margin-right: 8px;
             font-size: 16px;
         }
-        
+
         .dropdown-icon {
             transition: transform 0.3s ease;
             font-size: 12px;
             color: #fff;
         }
-        
+
         .menu-item-wrapper.active .dropdown-icon {
             transform: rotate(180deg);
         }
-        
+
         /* 确保sidebar样式正确 */
         .sidebar {
             width: 250px;
@@ -221,44 +221,44 @@
             flex-direction: column;
             height: 100vh;
         }
-        
+
         .system-title {
             margin-bottom: 30px;
             text-align: center;
         }
-        
+
         /* 修改sidebar-header样式 */
         .sidebar-header {
             margin-top: auto;
             padding: 20px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px 0;
         }
-        
+
         .last-login {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
             padding-left: 28px;
         }
-        
+
         /* 添加新的菜单图标样式 */
         .game-icon {
             color: #fff;
             font-size: 16px;
         }
-        
+
         .btn-group {
             display: flex;
             justify-content: center;
             gap: 5px;
         }
-        
+
         /* 修改sidebar样式 */
         .sidebar {
             width: 250px;
@@ -269,21 +269,21 @@
             flex-direction: column;
             height: 100vh;
         }
-        
+
         /* 修改菜单容器样式，添加flex-grow使其占据剩余空间 */
         .menu-container {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
-        
+
         /* 修改底部用户信息样式 */
         .sidebar-header {
             margin-top: 20px;  /* 减小顶部间距 */
             padding: 15px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .toolbar {
             display: flex;
             align-items: center;  /* 垂直居中对齐 */
@@ -293,14 +293,14 @@
             background-color: #f8f9fa;
             border-radius: 4px;
         }
-        
+
         .search-box {
             display: flex;
             align-items: center;
             gap: 10px;
             flex: 1;
         }
-        
+
         .search-box input {
             height: 38px;      /* 与按钮高度保持一致 */
             padding: 8px 12px;
@@ -309,7 +309,7 @@
             font-size: 14px;
             flex: 1;
         }
-        
+
         .btn {
             height: 38px;      /* 统一按钮高度 */
             padding: 0 16px;
@@ -319,18 +319,18 @@
             gap: 5px;
             white-space: nowrap;
         }
-        
+
         .toolbar-container {
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-        
+
         .search-container {
             width: 100%;
         }
-        
+
         .search-container input {
             width: 100%;
             padding: 8px 12px;
@@ -339,13 +339,13 @@
             font-size: 14px;
             box-sizing: border-box;
         }
-        
+
         .button-container {
             display: flex;
             gap: 10px;
             justify-content: flex-start;
         }
-        
+
         .btn {
             height: 38px;
             padding: 0 16px;
@@ -358,13 +358,13 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        
+
         .btn-primary {
             background-color: #007bff;
             color: white;
             border: none;
         }
-        
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
@@ -376,17 +376,17 @@
             // 检查用户是否登录
             String username = (String) session.getAttribute("username");
             Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-            
+
             if (username == null) {
                 response.sendRedirect("login.jsp");
                 return;
             }
-            
+
             // 打印调试信息
             System.out.println("Username: " + username);
             System.out.println("IsAdmin: " + isAdmin);
     %>
-    
+
     <div class="layout">
         <!-- 左侧导航 -->
         <div class="sidebar">
@@ -407,7 +407,7 @@
                             </div>
                         </div>
                     </li>
-                    
+
                     <li class="menu-item">
                         <div class="menu-item-wrapper" onclick="toggleSubmenu('systemManage')">
                             <div class="menu-item-content">
@@ -470,7 +470,7 @@
                     <span>欢迎您，<%= isAdmin != null && isAdmin ? "管理员 " : "用户 " %><%= username %></span>
                 </div>
                 <div class="last-login">
-                    <% 
+                    <%
                         java.sql.Timestamp lastLoginTime = (java.sql.Timestamp)session.getAttribute("lastLoginTime");
                         if (lastLoginTime != null) {
                             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -480,7 +480,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 右侧内容区域 -->
         <div class="content">
             <div class="content-header">
@@ -503,11 +503,24 @@
 
     <!-- 修改脚本引入顺序 -->
     <script src="js/welcome.js"></script>
+    <script src="js/logManage.js"></script>
     <script src="js/userManage.js"></script>
     <script src="js/adminManage.js"></script>
     <script src="js/gameManage.js"></script>
-    <script src="js/logManage.js"></script>
-    
+
+    <!-- 添加调试代码 -->
+    <script>
+        // 等待所有脚本加载完成
+        window.addEventListener('load', function() {
+            console.log('Checking global functions:');
+            console.log('showContent:', typeof window.showContent);
+            console.log('showLogContent:', typeof window.showLogContent);
+            console.log('loadLogList:', typeof window.loadLogList);
+            console.log('searchLogs:', typeof window.searchLogs);
+            console.log('formatDate:', typeof window.formatDate);
+        });
+    </script>
+
     <%
         } catch (Exception e) {
             e.printStackTrace();

@@ -4,9 +4,9 @@ window.showAdminContent = function(contentType, event) {
         const content = `
             <div class="toolbar-container">
                 <div class="button-container">
-                    <button class="btn btn-primary" onclick="window.addAdmin()">
-                        <span class="menu-icon">➕</span>添加管理员
-                    </button>
+<!--                    <button class="btn btn-primary" onclick="window.addAdmin()">-->
+<!--                        <span class="menu-icon">➕</span>添加管理员-->
+<!--                    </button>-->
                 </div>
             </div>
             <table class="table" id="adminTable">
@@ -19,7 +19,7 @@ window.showAdminContent = function(contentType, event) {
                         <th>手机号</th>
                         <th>创建时间</th>
                         <th>更新时间</th>
-                        <th>操作</th>
+<!--                        <th>操作</th>-->
                     </tr>
                 </thead>
                 <tbody>
@@ -31,7 +31,7 @@ window.showAdminContent = function(contentType, event) {
         `;
         
         document.getElementById('contentBody').innerHTML = content;
-        document.getElementById('contentTitle').textContent = '管理员管理';
+        document.getElementById('contentTitle').textContent = '管理员列表';
         window.loadAdminList();
     }
 };
@@ -59,16 +59,16 @@ window.loadAdminList = function() {
                         <td>${admin.mobile || ''}</td>
                         <td>${admin.created_at ? formatDate(admin.created_at) : ''}</td>
                         <td>${admin.updated_at ? formatDate(admin.updated_at) : ''}</td>
-                        <td>
-                            <div class="btn-group">
-                                <button onclick="editAdmin(${admin.id})" class="btn btn-warning">
-                                    <span class="menu-icon">✏️</span>编辑
-                                </button>
-                                <button onclick="deleteAdmin(${admin.id})" class="btn btn-danger">
-                                    <span class="menu-icon">🗑️</span>删除
-                                </button>
-                            </div>
-                        </td>
+<!--                        <td>-->
+<!--                            <div class="btn-group">-->
+<!--                                <button onclick="editAdmin(${admin.id})" class="btn btn-warning">-->
+<!--                                    <span class="menu-icon">✏️</span>编辑-->
+<!--                                </button>-->
+<!--                                <button onclick="deleteAdmin(${admin.id})" class="btn btn-danger">-->
+<!--                                    <span class="menu-icon">🗑️</span>删除-->
+<!--                                </button>-->
+<!--                            </div>-->
+<!--                        </td>-->
                     </tr>
                 `;
             }).join('');

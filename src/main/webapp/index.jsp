@@ -221,10 +221,10 @@
     <main class="main-content">
         <div class="game-grid">
             <%
-                // 数据库连接信息
+                // 修改数据库连接信息
                 String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-                String USER = "cloudcity";
-                String PASS = "cloudcity";
+                String USER = "cloudcity";     // 修改用户名
+                String PASS = "cloudcity";   // 修改密码
                 
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -277,7 +277,7 @@
                 </a>
                 &nbsp;|&nbsp;
                 <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
-                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
+                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案���标" style="vertical-align: middle; margin-right: 3px;">
                     陕公网安备61019102000653
                 </a>
             </p>

@@ -1,63 +1,63 @@
-function toggleSubmenu(submenuId) {
-    console.log('Toggling submenu:', submenuId);
-    const submenu = document.getElementById(submenuId);
-    const menuWrapper = submenu.parentElement.querySelector('.menu-item-wrapper');
-    
-    if (submenu && menuWrapper) {
-        console.log('Before toggle - submenu classList:', submenu.classList.toString());
-        console.log('Before toggle - submenu style.display:', submenu.style.display);
-        
-        submenu.classList.toggle('active');
-        menuWrapper.classList.toggle('active');
-        
-        console.log('After toggle - submenu classList:', submenu.classList.toString());
-        console.log('After toggle - submenu style.display:', submenu.style.display);
-        
-        submenu.style.display = submenu.classList.contains('active') ? 'block' : 'none';
-    } else {
-        console.error('Required elements not found:');
-        console.error('submenu:', submenu);
-        console.error('menuWrapper:', menuWrapper);
-    }
-}
-
-async function showContent(contentType, event) {
+// 添加全局的 showContent 函数
+window.showContent = function(contentType, event) {
     if (event) {
-        event.preventDefault();
+        event.stopPropagation();
     }
-    console.log('showContent called with type:', contentType);
-    console.log('Event:', event);
-
-    // 清除其他内容
-    document.getElementById('contentBody').innerHTML = '';
     
-    switch(contentType) {
-        case 'contentManage':
-            console.log('Loading content management...');
-            if (typeof window.showGameContent === 'function') {
-                window.showGameContent(contentType, event);
-            }
-            break;
-        case 'userList':
-            console.log('Loading user management...');
-            if (typeof window.showUserContent === 'function') {
-                window.showUserContent(contentType, event);
-            }
-            break;
-        case 'adminList':
-            console.log('Loading admin management...');
-            if (typeof window.showAdminContent === 'function') {
-                window.showAdminContent(contentType, event);
-            }
-            break;
-        case 'logList':
-            console.log('Loading log management...');
-            if (typeof window.showLogContent === 'function') {
-                window.showLogContent(contentType, event);
-            }
-            break;
+    console.log('Showing content:', contentType);
+
+    // 等待所有脚本加载完成
+    setTimeout(() => {
+        // 根据不同的内容类型显示不同的内容
+        switch(contentType) {
+            case 'adminList':
+                if (typeof window.showAdminContent === 'function') {
+                    window.showAdminContent('adminList', event);
+                } else {
+                    console.error('showAdminContent is not loaded');
+                }
+                break;
+            case 'userList':
+                if (typeof window.showUserContent === 'function') {
+                    window.showUserContent('userList', event);
+                } else {
+                    console.error('showUserContent is not loaded');
+                }
+                break;
+            case 'logList':
+                if (typeof window.showLogContent === 'function') {
+                    window.showLogContent('logList', event);
+                } else {
+                    console.error('showLogContent is not loaded');
+                }
+                break;
+            case 'contentManage':
+                if (typeof window.showGameContent === 'function') {
+                    window.showGameContent('contentManage', event);
+                } else {
+                    console.error('showGameContent is not loaded');
+                }
+                break;
+            default:
+                console.log('Unknown content type:', contentType);
+        }
+    }, 0);
+};
+
+// 添加子菜单切换函数
+function toggleSubmenu(submenuId) {
+    const submenu = document.getElementById(submenuId);
+    if (submenu) {
+        submenu.classList.toggle('active');
+        const parentWrapper = submenu.previousElementSibling;
+        if (parentWrapper) {
+            parentWrapper.classList.toggle('active');
+        }
     }
 }
+
+// 导出 toggleSubmenu 到全局
+window.toggleSubmenu = toggleSubmenu;
 
 function openModal(content) {
     const modal = document.getElementById('userModal');

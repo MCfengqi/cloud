@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户信息表';
 
 -- 创建数据库用户（如果不存在）并授权
-CREATE USER IF NOT EXISTS 'cloudcity'@'localhost' IDENTIFIED BY 'cloudcity';
-GRANT ALL PRIVILEGES ON cloudcity.* TO 'cloudcity'@'localhost';
+CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED BY '123456';
+GRANT ALL PRIVILEGES ON cloudcity.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;
 
 -- 插入一个默认管理员账号（可选）

@@ -11,6 +11,7 @@ import java.sql.*; // 导入SQL相关类
 import java.util.*; // 导入Java集合框架
 import com.google.gson.Gson; // 导入Gson类用于JSON处理
 import com.google.gson.JsonObject; // 导入JsonObject类用于处理JSON对象
+import com.example.cloudcity.utils.LogUtils; // 导入LogUtils类用于日志记录
 
 @WebServlet("/AdminManageServlet")
 public class AdminManageServlet extends HttpServlet { // 定义AdminManageServlet类继承自HttpServlet
@@ -77,7 +78,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
 
                 switch (action) {
                     case "update":
-                        updateAdmin(jsonObject, response); // 处理更新管理员信息请求
+                        updateAdmin(jsonObject, request, response); // 处理更新管理员信息请求
                         break;
                     case "add":
                         addAdmin(request, response); // 处理添加管理员请求
@@ -201,7 +202,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
         String email = request.getParameter("email"); // 获取邮箱
         String mobile = request.getParameter("mobile"); // 获取手机号
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO users (username, password, email, mobile, is_admin) VALUES (?, ?, ?, ?, 1)")) { // 准备预编译SQL语句
 
@@ -212,12 +213,22 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
 
             int result = stmt.executeUpdate(); // 执行插入操作
             response.getWriter().write("{\"success\": " + (result > 0) + "}"); // 返回插入结果
+
+            // 添加日志记录
+            LogUtils.logOperation(
+                "添加管理员",
+                "添加管理员: " + username,
+                (String) request.getSession().getAttribute("username"),
+                request,
+                "成功"
+            );
         }
     }
 
-    private void updateAdmin(JsonObject data, HttpServletResponse response)
+    private void updateAdmin(JsonObject data, HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         long id = data.get("id").getAsLong(); // 获取管理员ID
+        String username = data.get("username").getAsString(); // 获取用户名
         String email = data.get("email").getAsString(); // 获取邮箱
         String mobile = data.get("mobile").getAsString(); // 获取手机号
         boolean isAdmin = data.get("isAdmin").getAsBoolean(); // 获取是否为管理员
@@ -270,6 +281,15 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
             System.out.println("Update result: " + result); // 打印更新结果
 
             response.getWriter().write("{\"success\": " + (result > 0) + "}"); // 返回更新结果
+
+            // 添加日志记录
+            LogUtils.logOperation(
+                "更新管理员",
+                "更新管理员信息: " + username,
+                (String) request.getSession().getAttribute("username"),
+                request,
+                "成功"
+            );
         } catch (Exception e) {
             System.err.println("Error updating admin: " + e.getMessage()); // 打印错误信息到控制台
             e.printStackTrace(); // 打印堆栈跟踪信息
@@ -304,6 +324,15 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
                 response.getWriter().write("{\"success\": " + (result > 0) + "}"); // 返回删除结果
             }
         }
+
+        // 添加日志记录
+        LogUtils.logOperation(
+            "删除管理员",
+            "删除管理员ID: " + id,
+            (String) request.getSession().getAttribute("username"),
+            request,
+            "成功"
+        );
     }
 
     private void getAdmin(HttpServletRequest request, HttpServletResponse response)
