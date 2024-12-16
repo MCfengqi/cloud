@@ -14,8 +14,8 @@ import java.util.List;
 
 public class AdminService {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "cloudcity";
-    private static final String PASS = "cloudcity";
+    private static final String USER = "root";
+    private static final String PASS = "123456";
     
     private static AdminService instance;
     

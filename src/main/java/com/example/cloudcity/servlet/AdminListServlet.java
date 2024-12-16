@@ -30,8 +30,8 @@ import java.sql.Timestamp; // 导入Timestamp类用于处理时间戳
 public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类继承自HttpServlet
     private static final AdminService adminService = AdminService.getInstance(); // 获取AdminService实例
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "cloudcity"; // 数据库用户名
-    private static final String PASS = "cloudcity"; // 数据库密码
+    private static final String USER = "root"; // 数据库用户名
+    private static final String PASS = "123456"; // 数据库密码
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

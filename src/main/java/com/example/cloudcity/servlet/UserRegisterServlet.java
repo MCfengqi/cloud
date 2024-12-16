@@ -21,8 +21,8 @@ public class UserRegisterServlet extends HttpServlet {
 
     // 数据库连接信息
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "cloudcity";
-    private static final String PASS = "cloudcity";
+    private static final String USER = "root";
+    private static final String PASS = "123456";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 设置响应内容类型

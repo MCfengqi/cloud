@@ -12,8 +12,8 @@ public class DataSourceUtils {
         try {
             cpds.setDriverClass("com.mysql.cj.jdbc.Driver");
             cpds.setJdbcUrl("jdbc:mysql://localhost:3306/cloudcity");
-            cpds.setUser("cloudcity");
-            cpds.setPassword("cloudcity");
+            cpds.setUser("root");
+            cpds.setPassword("123456");
             cpds.setInitialPoolSize(3);
             cpds.setMinPoolSize(3);
             cpds.setMaxPoolSize(15);

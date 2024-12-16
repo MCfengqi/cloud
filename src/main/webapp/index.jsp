@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>云城游戏门户</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -99,7 +101,7 @@
             border-color: #0056b3;
         }
 
-        /* 主要内容区域 */
+        /* 主要��容区域 */
         .main-content {
             margin-top: 80px;
             padding: 20px;
@@ -194,6 +196,30 @@
             margin: 0 auto;
             text-align: center;
         }
+
+        /* 添加轮播图样式 */
+        .carousel {
+            width: 100%;
+            max-height: 600px; /* 设置最大高度 */
+            overflow: hidden;
+        }
+
+        .carousel-inner {
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-item {
+            width: 100%;
+            height: 600px; /* 固定高度 */
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保持比例填充 */
+            object-position: center; /* 居中显示 */
+        }
     </style>
 </head>
 <body>
@@ -217,14 +243,47 @@
         </div>
     </header>
 
+    <!-- 轮播图 -->
+    <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000" style="margin-top: 50px;">
+        <!-- 指示器 -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="2"></button>
+        </div>
+        
+        <!-- 轮播图片 -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/989d786430a14afa.jpg" class="d-block w-100" alt="游戏图片1">
+            </div>
+            <div class="carousel-item">
+                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/ad81b155043e66ad.jpg" class="d-block w-100" alt="游戏图片2">
+            </div>
+            <div class="carousel-item">
+                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/d3b164437abf8e16.jpg" class="d-block w-100" alt="游戏图片3">
+            </div>
+        </div>
+        
+        <!-- 控制按钮 -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
     <!-- 主要内容区域 -->
     <main class="main-content">
         <div class="game-grid">
             <%
                 // 修改数据库连接信息
                 String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-                String USER = "cloudcity";     // 修改用户名
-                String PASS = "cloudcity";   // 修改密码
+                String USER = "root";     // 修改用户名
+                String PASS = "123456";   // 修改密码
                 
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -261,7 +320,7 @@
                     
                 } catch(Exception e) {
                     e.printStackTrace();
-                    out.println("获取游戏列表失败：" + e.getMessage());
+                    out.println("获取游戏列表失败请检查网络或数据库" + e.getMessage());
                 }
             %>
         </div>
@@ -277,11 +336,26 @@
                 </a>
                 &nbsp;|&nbsp;
                 <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
-                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案���标" style="vertical-align: middle; margin-right: 3px;">
+                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
                     陕公网安备61019102000653
                 </a>
             </p>
         </div>
     </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 初始化轮播图
+        document.addEventListener('DOMContentLoaded', function() {
+            var myCarousel = document.getElementById('imageCarousel');
+            var carousel = new bootstrap.Carousel(myCarousel, {
+                interval: 3000,
+                ride: true
+            });
+            // 强制开始自动播放
+            carousel.cycle();
+        });
+    </script>
 </body>
 </html>

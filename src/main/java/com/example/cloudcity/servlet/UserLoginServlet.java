@@ -21,8 +21,8 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
 
     // 数据库连接信息
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "cloudcity"; // 数据库用户名
-    private static final String PASS = "cloudcity"; // 数据库密码
+    private static final String USER = "root"; // 数据库用户名
+    private static final String PASS = "123456"; // 数据库密码
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

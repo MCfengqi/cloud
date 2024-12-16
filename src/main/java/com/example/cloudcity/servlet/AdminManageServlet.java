@@ -16,8 +16,8 @@ import com.example.cloudcity.utils.LogUtils; // 导入LogUtils类用于日志记
 @WebServlet("/AdminManageServlet")
 public class AdminManageServlet extends HttpServlet { // 定义AdminManageServlet类继承自HttpServlet
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "cloudcity"; // 数据库用户名
-    private static final String PASS = "cloudcity"; // 数据库密码
+    private static final String USER = "root"; // 数据库用户名
+    private static final String PASS = "123456"; // 数据库密码
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

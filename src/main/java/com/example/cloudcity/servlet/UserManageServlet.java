@@ -25,8 +25,8 @@ import com.example.cloudcity.utils.LogUtils;
 public class
 UserManageServlet extends HttpServlet {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "cloudcity";
-    private static final String PASS = "cloudcity";
+    private static final String USER = "root";
+    private static final String PASS = "123456";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {

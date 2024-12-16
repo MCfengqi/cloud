@@ -24,8 +24,8 @@ import com.example.cloudcity.utils.LogUtils;
 public class GameManageServlet extends HttpServlet { // 定义GameManageServlet类继承自HttpServlet
     // 数据库连接信息
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "cloudcity"; // 数据库���户名
-    private static final String PASS = "cloudcity"; // 数据库密码
+    private static final String USER = "root"; // 数据库���户名
+    private static final String PASS = "123456"; // 数据库密码
 
     // 创建Gson对象用于JSON处理
     private final Gson gson = new Gson(); // 创建Gson实例
