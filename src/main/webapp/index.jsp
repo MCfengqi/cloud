@@ -103,7 +103,7 @@
 
         /* 主要��容区域 */
         .main-content {
-            margin-top: 80px;
+            margin-top: 0px;
             padding: 20px;
             max-width: 1200px;
             margin-left: auto;
@@ -220,142 +220,144 @@
             object-fit: cover; /* 保持比例填充 */
             object-position: center; /* 居中显示 */
         }
+
+
     </style>
 </head>
 <body>
-    <!-- 头部导航 -->
-    <header class="header">
-        <div class="header-content">
-            <a href="index.jsp" class="logo">
-                <span>🎮 云城游戏</span>
-            </a>
-            <nav class="nav-links">
-                <a href="#games">游戏中心</a>
-                <a href="#news">新闻资讯</a>
-                <a href="#about">关于我们</a>
-                <a href="https://www.mcfengqi.icu/">我的网站</a>
-                <a href="https://img.mcfengqi.icu/">我的图床</a>
-            </nav>
-            <div class="auth-buttons">
-                <a href="login.jsp" class="login-btn">登录</a>
-                <a href="register.jsp" class="register-btn">注册</a>
-            </div>
+<!-- 头部导航 -->
+<header class="header">
+    <div class="header-content">
+        <a href="index.jsp" class="logo">
+            <span>🎮 云城游戏</span>
+        </a>
+        <nav class="nav-links">
+            <a href="#games">游戏中心</a>
+            <a href="#news">新闻资讯</a>
+            <a href="#about">关于我们</a>
+            <a href="https://www.mcfengqi.icu/">我的网站</a>
+            <a href="https://img.mcfengqi.icu/">我的图床</a>
+        </nav>
+        <div class="auth-buttons">
+            <a href="login.jsp" class="login-btn">登录</a>
+            <a href="register.jsp" class="register-btn">注册</a>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- 轮播图 -->
-    <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000" style="margin-top: 50px;">
-        <!-- 指示器 -->
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="2"></button>
-        </div>
-        
-        <!-- 轮播图片 -->
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/989d786430a14afa.jpg" class="d-block w-100" alt="游戏图片1">
-            </div>
-            <div class="carousel-item">
-                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/ad81b155043e66ad.jpg" class="d-block w-100" alt="游戏图片2">
-            </div>
-            <div class="carousel-item">
-                <img src="https://img.mcfengqi.icu/LightPicture/2024/12/d3b164437abf8e16.jpg" class="d-block w-100" alt="游戏图片3">
-            </div>
-        </div>
-        
-        <!-- 控制按钮 -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+<!-- 轮播图 -->
+<div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000" style="margin-top: 50px;">
+    <!-- 指示器 -->
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="2"></button>
     </div>
 
-    <!-- 主要内容区域 -->
-    <main class="main-content">
-        <div class="game-grid">
-            <%
-                // 修改数据库连接信息
-                String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-                String USER = "root";     // 修改用户名
-                String PASS = "123456";   // 修改密码
-                
-                try {
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-                    
-                    // 查询游戏列表
-                    String sql = "SELECT * FROM gamelist ORDER BY created_at DESC";
-                    PreparedStatement stmt = conn.prepareStatement(sql);
-                    ResultSet rs = stmt.executeQuery();
-                    
-                    // 遍历结果集并显示游戏卡片
-                    while(rs.next()) {
-                        String gameImg = rs.getString("gameimg");
-                        String gameName = rs.getString("gamename");
-                        String gameDesc = rs.getString("gametxt");
-                        String gameLink = rs.getString("gamelink");
-            %>
-                        <div class="game-card">
-                            <img src="<%= gameImg %>" alt="<%= gameName %>" class="game-image"
-                                 onerror="this.src='images/default-game.png'">
-                            <div class="game-info">
-                                <h3 class="game-title"><%= gameName %></h3>
-                                <p class="game-description"><%= gameDesc %></p>
-                                <a href="<%= gameLink %>" class="game-button" target="_blank">立即下载</a>
-                            </div>
-                        </div>
-            <%
-                    }
-                    
-                    // 关闭数据库连接
-                    rs.close();
-                    stmt.close();
-                    conn.close();
-                    
-                } catch(Exception e) {
-                    e.printStackTrace();
-                    out.println("获取游戏列表失败请检查网络或数据库" + e.getMessage());
+    <!-- 轮播图片 -->
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://img.mcfengqi.icu/LightPicture/2024/12/989d786430a14afa.jpg" class="d-block w-100" alt="游戏图片1">
+        </div>
+        <div class="carousel-item">
+            <img src="https://img.mcfengqi.icu/LightPicture/2024/12/ad81b155043e66ad.jpg" class="d-block w-100" alt="游戏图片2">
+        </div>
+        <div class="carousel-item">
+            <img src="https://img.mcfengqi.icu/LightPicture/2024/12/d3b164437abf8e16.jpg" class="d-block w-100" alt="游戏图片3">
+        </div>
+    </div>
+
+    <!-- 控制按钮 -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- 主要内容区域 -->
+<main class="main-content">
+    <div class="game-grid">
+        <%
+            // 修改数据库连接信息
+            String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
+            String USER = "root";     // 修改用户名
+            String PASS = "123456";   // 修改密码
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+
+                // 查询游戏列表
+                String sql = "SELECT * FROM gamelist ORDER BY created_at DESC";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery();
+
+                // 遍历结果集并显示游戏卡片
+                while(rs.next()) {
+                    String gameImg = rs.getString("gameimg");
+                    String gameName = rs.getString("gamename");
+                    String gameDesc = rs.getString("gametxt");
+                    String gameLink = rs.getString("gamelink");
+        %>
+        <div class="game-card">
+            <img src="<%= gameImg %>" alt="<%= gameName %>" class="game-image"
+                 onerror="this.src='images/default-game.png'">
+            <div class="game-info">
+                <h3 class="game-title"><%= gameName %></h3>
+                <p class="game-description"><%= gameDesc %></p>
+                <a href="xiangqing.jsp?gameName=<%= gameName %>&gameDesc=<%= gameDesc %>&gameImg=<%= gameImg %>" class="game-button" >点击详情</a>
+            </div>
+        </div>
+        <%
                 }
-            %>
-        </div>
-    </main>
 
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>© 2024 云城游戏门户. All rights reserved.</p>
-            <p>
-                <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
-                    陕ICP备2024054614号
-                </a>
-                &nbsp;|&nbsp;
-                <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
-                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
-                    陕公网安备61019102000653
-                </a>
-            </p>
-        </div>
-    </footer>
+                // 关闭数据库连接
+                rs.close();
+                stmt.close();
+                conn.close();
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // 初始化轮播图
-        document.addEventListener('DOMContentLoaded', function() {
-            var myCarousel = document.getElementById('imageCarousel');
-            var carousel = new bootstrap.Carousel(myCarousel, {
-                interval: 3000,
-                ride: true
-            });
-            // 强制开始自动播放
-            carousel.cycle();
+            } catch(Exception e) {
+                e.printStackTrace();
+                out.println("获取游戏列表失败请检查网络或数据库" + e.getMessage());
+            }
+        %>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="footer-content">
+        <p>© 2024 云城游戏门户. All rights reserved.</p>
+        <p>
+            <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
+                陕ICP备2024054614号
+            </a>
+            &nbsp;|&nbsp;
+            <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
+                <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
+                陕公网安备61019102000653
+            </a>
+        </p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 初始化轮播图
+    document.addEventListener('DOMContentLoaded', function() {
+        var myCarousel = document.getElementById('imageCarousel');
+        var carousel = new bootstrap.Carousel(myCarousel, {
+            interval: 2000,
+            ride: true
         });
-    </script>
+        // 强制开始自动播放
+        carousel.cycle();
+    });
+</script>
 </body>
 </html>
