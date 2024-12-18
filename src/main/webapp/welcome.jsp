@@ -440,6 +440,10 @@
                                 <span class="menu-icon">📝</span>
                                 <span>内容管理</span>
                             </li>
+                            <li class="submenu-item" onclick="window.showContent('orderManage', event)">
+                                <span class="menu-icon">🛒</span>
+                                <span>订单管理</span>
+                            </li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -488,7 +492,7 @@
             </div>
             <div class="content-body" id="contentBody">
                 <!-- 初始内容 -->
-                <h3>欢迎使用云城游戏管理系统</h3>
+                <h3>欢迎使用云城游戏管理系��</h3>
             </div>
         </div>
     </div>
@@ -503,10 +507,11 @@
 
     <!-- 修改脚本引入顺序 -->
     <script src="js/welcome.js"></script>
+    <script src="js/gameManage.js"></script>
+    <script src="js/gameOrderManage.js"></script>
     <script src="js/logManage.js"></script>
     <script src="js/userManage.js"></script>
     <script src="js/adminManage.js"></script>
-    <script src="js/gameManage.js"></script>
 
     <!-- 添加调试代码 -->
     <script>
@@ -514,6 +519,8 @@
         window.addEventListener('load', function() {
             console.log('Checking global functions:');
             console.log('showContent:', typeof window.showContent);
+            console.log('showGameContent:', typeof window.showGameContent);
+            console.log('showOrderContent:', typeof window.showOrderContent);
             console.log('showLogContent:', typeof window.showLogContent);
             console.log('loadLogList:', typeof window.loadLogList);
             console.log('searchLogs:', typeof window.searchLogs);
@@ -539,7 +546,7 @@
                 &nbsp;|&nbsp;
                 <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
                     <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
-                    陕公网安备61019102000653
+                    陕公网安���61019102000653
                 </a>
             </p>
         </div>

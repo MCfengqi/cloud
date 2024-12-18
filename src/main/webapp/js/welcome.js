@@ -38,6 +38,13 @@ window.showContent = function(contentType, event) {
                     console.error('showGameContent is not loaded');
                 }
                 break;
+            case 'orderManage':
+                if (typeof window.showOrderContent === 'function') {
+                    window.showOrderContent('orderManage', event);
+                } else {
+                    console.error('showOrderContent is not loaded');
+                }
+                break;
             default:
                 console.log('Unknown content type:', contentType);
         }

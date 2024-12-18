@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.math.BigDecimal" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -101,7 +102,7 @@
             border-color: #0056b3;
         }
 
-        /* 主要��容区域 */
+        /* 主要内区域 */
         .main-content {
             margin-top: 0px;
             padding: 20px;
@@ -126,7 +127,7 @@
             transition: transform 0.3s;
             display: flex;
             flex-direction: column;
-            height: 400px;
+            height: 500px;
         }
 
         .game-card:hover {
@@ -159,7 +160,7 @@
             margin-bottom: 15px;
             overflow: hidden;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             flex: 1;
         }
@@ -221,7 +222,73 @@
             object-position: center; /* 居中显示 */
         }
 
+        /* 模态框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+        }
 
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto; /* 在页面中居中 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%; /* 宽度 */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .game-price {
+            font-size: 20px;
+            color: #ff4d4f;
+            font-weight: bold;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 77, 79, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 60px;
+        }
+
+        .game-price::before {
+            content: '￥';
+            font-size: 16px;
+            margin-right: 2px;
+            color: #ff4d4f;
+        }
+
+        .game-price::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 77, 79, 0.05), rgba(255, 77, 79, 0.1));
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -234,8 +301,8 @@
         <nav class="nav-links">
             <a href="#games">游戏中心</a>
             <a href="#news">新闻资讯</a>
-            <a href="#about">关于我们</a>
-            <a href="https://www.mcfengqi.icu/">我的网站</a>
+            <a href="#" id="logQueryBtn" class="nav-links">日志查询</a>
+            <%--            <a href="https://www.mcfengqi.icu/">我的网站</a>--%>
             <a href="https://img.mcfengqi.icu/">我的图床</a>
         </nav>
         <div class="auth-buttons">
@@ -298,10 +365,12 @@
 
                 // 遍历结果集并显示游戏卡片
                 while(rs.next()) {
+                    int gameId = rs.getInt("gameid");
                     String gameImg = rs.getString("gameimg");
                     String gameName = rs.getString("gamename");
                     String gameDesc = rs.getString("gametxt");
                     String gameLink = rs.getString("gamelink");
+                    BigDecimal gameMoney=rs.getBigDecimal("gamemoney");
         %>
         <div class="game-card">
             <img src="<%= gameImg %>" alt="<%= gameName %>" class="game-image"
@@ -309,7 +378,8 @@
             <div class="game-info">
                 <h3 class="game-title"><%= gameName %></h3>
                 <p class="game-description"><%= gameDesc %></p>
-                <a href="xiangqing.jsp?gameName=<%= gameName %>&gameDesc=<%= gameDesc %>&gameImg=<%= gameImg %>" class="game-button" >点击详情</a>
+                <div class="game-price">价格：<%= gameMoney %></div>
+                <a href="xiangqing.jsp?gameName=<%= gameName %>&gameDesc=<%= gameDesc %>&gameMoney=<%= gameMoney %>&gameImg=<%= gameImg %>&gameId=<%= gameId %>" class="game-button">点击详情</a>
             </div>
         </div>
         <%
@@ -358,6 +428,47 @@
         // 强制开始自动播放
         carousel.cycle();
     });
+</script>
+<script>
+    // 获取模态框
+    var modal = document.getElementById("logModal");
+
+    // 获取按钮
+    var btn = document.getElementById("logQueryBtn");
+
+    // 获取关闭按钮
+    var span = document.getElementsByClassName("close")[0];
+
+    // 当用户点击按钮时，打开模态框
+    btn.onclick = function() {
+        modal.style.display = "block";
+        loadLogs(); // 加载日志内容
+    }
+
+    // 当用户点击关闭按钮时，关闭模态框
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // 当用户点击模态框外部时，关闭模态框
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // 加载日志内容的函数
+    function loadLogs() {
+        // 使用 AJAX 请求获取日志内容
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "getLogs.jsp", true); // 假设你有一个 getLogs.jsp 文件来处理日志查询
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("logContent").innerHTML = xhr.responseText;
+            }
+        };
+        xhr.send();
+    }
 </script>
 </body>
 </html>

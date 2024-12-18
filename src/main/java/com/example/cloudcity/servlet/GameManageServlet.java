@@ -20,11 +20,12 @@ import java.io.*; // 导入输入输出流相关类
 import java.sql.*; // 导入SQL相关类
 import java.util.*; // 导入集合框架相关类
 import com.example.cloudcity.utils.LogUtils;
+import java.math.BigDecimal;
 
 public class GameManageServlet extends HttpServlet { // 定义GameManageServlet类继承自HttpServlet
     // 数据库连接信息
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "root"; // 数据库���户名
+    private static final String USER = "root"; // 数据库用户名
     private static final String PASS = "123456"; // 数据库密码
 
     // 创建Gson对象用于JSON处理
@@ -55,7 +56,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
                     sendError(response, "Unknown action: " + action); // 发送错误响应
             }
         } catch (Exception e) {
-            e.printStackTrace(); // 打印堆栈跟踪信息
+            e.printStackTrace(); // 打印堆栈踪信息
             sendError(response, e.getMessage()); // 发送错误响应
         }
     }
@@ -87,7 +88,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             // 根据action执行相应操作
             switch (action) {
                 case "add":
-                    addGame(jsonData, request, response); // 调用addGame方法添���新游戏
+                    addGame(jsonData, request, response); // 调用addGame方法添加新游戏
                     break;
                 case "update":
                     updateGame(jsonData, request, response); // 调用updateGame方法更新游戏信息
@@ -126,6 +127,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
                 game.put("gamelink", rs.getString("gamelink")); // 存储游戏链接
                 game.put("created_at", rs.getTimestamp("created_at")); // 存储创建时间
                 game.put("updated_at", rs.getTimestamp("updated_at")); // 存储更新时间
+                game.put("gamemoney", rs.getBigDecimal("gamemoney"));//游戏售价
                 games.add(game); // 将游戏信息添加到List中
             }
         }
@@ -154,7 +156,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
 
             if (rs.next()) { // 检查结果集中是否有数据
                 // 构建游戏信息对象
-                Map<String, Object> game = new HashMap<>(); // 创建Map存储单个游戏信息
+                Map<String, Object> game = new HashMap<>(); // 创��Map存储单个游戏信息
                 game.put("gameid", rs.getLong("gameid")); // 存储游戏ID
                 game.put("gamename", rs.getString("gamename")); // 存储游戏名称
                 game.put("gameimg", rs.getString("gameimg")); // 存储游戏图片URL
@@ -162,6 +164,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
                 game.put("gamelink", rs.getString("gamelink")); // 存储游戏链接
                 game.put("created_at", rs.getTimestamp("created_at")); // 存储创建时间
                 game.put("updated_at", rs.getTimestamp("updated_at")); // 存储更新时间
+                game.put("gamemoney", rs.getBigDecimal("gamemoney"));
 
                 new Gson().toJson(game, response.getWriter()); // 将游戏信息转换为JSON并写入响应
             } else {
@@ -182,16 +185,18 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
         String gameimg = jsonData.get("gameimg").getAsString(); // 获取游戏图片URL
         String gametxt = jsonData.get("gametxt").getAsString(); // 获取游戏描述
         String gamelink = jsonData.get("gamelink").getAsString(); // 获取游戏链接
+        BigDecimal gamemoney = new BigDecimal(jsonData.get("gamemoney").getAsString());
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO gamelist (gamename, gameimg, gametxt, gamelink, created_at, updated_at) " +
-                             "VALUES (?, ?, ?, ?, NOW(), NOW())")) { // 准备SQL插入语句
+                     "INSERT INTO gamelist (gamename, gameimg, gametxt, gamelink, gamemoney, created_at, updated_at) " +
+                             "VALUES (?, ?, ?, ?, ?, NOW(), NOW())")) { // 准备SQL插入语句
 
             stmt.setString(1, gamename); // 设置SQL插入参数
             stmt.setString(2, gameimg); // 设置SQL插入参数
             stmt.setString(3, gametxt); // 设置SQL插入参数
             stmt.setString(4, gamelink); // 设置SQL插入参数
+            stmt.setBigDecimal(5, gamemoney);
 
             int result = stmt.executeUpdate(); // 执行插入操作并获取受影响的行数
             if (result > 0) {
@@ -221,17 +226,19 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
         String gameimg = jsonData.get("gameimg").getAsString(); // 获取游戏图片URL
         String gametxt = jsonData.get("gametxt").getAsString(); // 获取游戏描述
         String gamelink = jsonData.get("gamelink").getAsString(); // 获取游戏链接
+        BigDecimal gamemoney = new BigDecimal(jsonData.get("gamemoney").getAsString());
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE gamelist SET gamename = ?, gameimg = ?, gametxt = ?, " +
-                             "gamelink = ?, updated_at = NOW() WHERE gameid = ?")) { // 准备SQL更新语句
+                             "gamelink = ?, gamemoney = ?, updated_at = NOW() WHERE gameid = ?")) { // 准备SQL更新语句
 
             stmt.setString(1, gamename); // 设置SQL更新参数
             stmt.setString(2, gameimg); // 设置SQL更新参数
             stmt.setString(3, gametxt); // 设置SQL更新参数
             stmt.setString(4, gamelink); // 设置SQL更新参数
-            stmt.setLong(5, gameId); // 设置SQL更新参数
+            stmt.setBigDecimal(5, gamemoney);
+            stmt.setLong(6, gameId); // 设置SQL更新参数
 
             int result = stmt.executeUpdate(); // 执行更新操作并获取受影响的行数
             if (result > 0) {

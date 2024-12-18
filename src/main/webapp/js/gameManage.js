@@ -30,6 +30,7 @@ window.showGameContent = function(contentType, event) {
                         <th>游戏图片</th>
                         <th>游戏描述</th>
                         <th>游戏链接</th>
+                        <th>游戏价格</th>
                         <th>创建时间</th>
                         <th>更新时间</th>
                         <th>操作</th>
@@ -73,6 +74,10 @@ window.addGame = function() {
             <div class="form-group game-form-group">
                 <label>游戏链接：</label>
                 <input type="url" name="gamelink" class="game-input" required>
+            </div>
+            <div class="form-group game-form-group">
+                <label>游戏价格：</label>
+                <input type="number" name="gamemoney" class="game-input" required step="0.01" min="0">
             </div>
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">保存</button>
@@ -259,6 +264,7 @@ function loadGameList() {
                             ${game.gamelink ? '查看下载链接' : ''}
                         </a>
                     </td>
+                    <td>${game.gamemoney || '0.00'}</td>
                     <td>${formatDate(game.created_at) || ''}</td>
                     <td>${formatDate(game.updated_at) || ''}</td>
                     <td>
@@ -331,6 +337,10 @@ function editGame(gameId) {
                             <div class="form-group game-form-group">
                                 <label>游戏链接：</label>
                                 <input type="url" name="gamelink" class="game-input" value="${game.gamelink}" required>
+                            </div>
+                            <div class="form-group game-form-group">
+                                <label>游戏价格：</label>
+                                <input type="number" name="gamemoney" class="game-input" value="${game.gamemoney || '0.00'}" required step="0.01" min="0">
                             </div>
                         </div>
                         <div class="button-group">
