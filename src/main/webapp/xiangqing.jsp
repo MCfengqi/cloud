@@ -667,6 +667,24 @@
             margin-bottom: 20px;
             padding-right: 30px;
         }
+
+        .complete-payment-btn {
+            background: #52c41a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .complete-payment-btn:hover {
+            background: #73d13d;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(82, 196, 26, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -680,6 +698,7 @@
             <a href="index.jsp">游戏中心</a>
             <a href="#news">新闻资讯</a>
             <a href="#about">关于我们</a>
+            <a href="dingdan.jsp">我的订单</a>
         </nav>
         <div class="auth-buttons">
             <a href="login.jsp" class="login-btn">登录</a>
@@ -765,6 +784,7 @@
     <h2>扫码支付</h2>
     <img id="qrCode" src="" alt="支付二维码">
     <p>请使用选择的支付方式完成支付</p>
+    <button class="complete-payment-btn" onclick="completePayment()">完成支付</button>
 </div>
 
 <!-- 页脚 -->
@@ -1037,10 +1057,52 @@
         }
     });
 
-    // 修改购物车按钮的点击事件
+    // 修改购物车按钮���点击事件
     document.querySelector('.cart-button2').onclick = function(event) {
         event.stopPropagation(); // 防止事件冒泡
         showCart();
+    }
+
+    function completePayment() {
+        const selectedPayment = document.querySelector('.payment-option.selected');
+        if (!selectedPayment) {
+            alert('请选择支付方式！');
+            return;
+        }
+        
+        const paymentType = selectedPayment.dataset.payment;
+        const orderData = {
+            total: '<%= gameMoney %>',
+            amount: '<%= gameMoney %>',
+            status: '已支付',
+            paytype: paymentType,
+            gamename: '<%= gameName %>',
+            gameimg: '<%= gameImg %>',
+            gametxt: '<%= gameDesc %>',
+            user_id: 1  // 这里需要替换为实际的用户ID
+        };
+        
+        // 发送订单数据到服务器
+        fetch('OrderServlet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('支付成功！');
+                window.location.href = 'dingdan.jsp';
+            } else {
+                alert('支付失败：' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('系统错误，请稍后重试');
+        });
     }
 </script>
 </html>

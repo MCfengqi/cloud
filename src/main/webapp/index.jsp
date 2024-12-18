@@ -299,11 +299,11 @@
             <span>🎮 云城游戏</span>
         </a>
         <nav class="nav-links">
-            <a href="#games">游戏中心</a>
+            <a href="index.jsp">游戏中心</a>
             <a href="#news">新闻资讯</a>
             <a href="#" id="logQueryBtn" class="nav-links">日志查询</a>
-            <%--            <a href="https://www.mcfengqi.icu/">我的网站</a>--%>
-            <a href="https://img.mcfengqi.icu/">我的图床</a>
+<%--            <a href="https://www.mcfengqi.icu/">我的网站</a>--%>
+            <a href="dingdan.jsp">我的订单</a>
         </nav>
         <div class="auth-buttons">
             <a href="login.jsp" class="login-btn">登录</a>
