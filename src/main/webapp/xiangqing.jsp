@@ -697,8 +697,9 @@
         <nav class="nav-links">
             <a href="index.jsp">游戏中心</a>
             <a href="#news">新闻资讯</a>
-            <a href="#about">关于我们</a>
             <a href="dingdan.jsp">我的订单</a>
+            <a href="https://img.mcfengqi.icu" target="_blank">我的图床</a>
+            <a href="about.jsp">关于我们</a>
         </nav>
         <div class="auth-buttons">
             <a href="login.jsp" class="login-btn">登录</a>
@@ -1057,7 +1058,7 @@
         }
     });
 
-    // 修改购物车按钮���点击事件
+    // 修改购物车按钮点击事件
     document.querySelector('.cart-button2').onclick = function(event) {
         event.stopPropagation(); // 防止事件冒泡
         showCart();

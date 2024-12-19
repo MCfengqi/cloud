@@ -492,7 +492,7 @@
             </div>
             <div class="content-body" id="contentBody">
                 <!-- 初始内容 -->
-                <h3>欢迎使用云城游戏管理系��</h3>
+                <h3>欢迎使用云城游戏管理系统</h3>
             </div>
         </div>
     </div>
@@ -535,21 +535,5 @@
         }
     %>
 
-    <!-- 页脚
-    <footer class="footer">
-        <div class="footer-content">
-            <p>© 2024 云城游戏门户. All rights reserved.</p>
-            <p>
-                <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
-                    陕ICP备2024054614号
-                </a>
-                &nbsp;|&nbsp;
-                <a href="http://www.beian.gov.cn/portal/registerSystemInfo" target="_blank" style="color: #fff; text-decoration: none;">
-                    <img src="https://img.mcfengqi.icu/LightPicture/2024/11/75fb7a50447cf897.png" alt="公安备案图标" style="vertical-align: middle; margin-right: 3px;">
-                    陕公网安���61019102000653
-                </a>
-            </p>
-        </div>
-    </footer> -->
 </body>
 </html>

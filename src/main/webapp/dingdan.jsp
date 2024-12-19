@@ -223,6 +223,7 @@
     </style>
 </head>
 <body>
+<!-- 头部导航 -->
 <header class="header">
     <div class="header-content">
         <a href="index.jsp" class="logo">
@@ -231,9 +232,9 @@
         <nav class="nav-links">
             <a href="index.jsp">游戏中心</a>
             <a href="#news">新闻资讯</a>
-            <a href="#" id="logQueryBtn" class="nav-links">日志查询</a>
-            <%--            <a href="https://www.mcfengqi.icu/">我的网站</a>--%>
             <a href="dingdan.jsp">我的订单</a>
+            <a href="https://img.mcfengqi.icu" target="_blank">我的图床</a>
+            <a href="about.jsp">关于我们</a>
         </nav>
         <div class="auth-buttons">
             <a href="login.jsp" class="login-btn">登录</a>
@@ -294,7 +295,7 @@
 <!-- 页脚 -->
 <footer class="footer">
     <div class="footer-content">
-        <p>© 2024 云城游戏��户. All rights reserved.</p>
+        <p>© 2024 云城游戏门户. All rights reserved.</p>
         <p>
             <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #fff; text-decoration: none;">
                 陕ICP备2024054614号

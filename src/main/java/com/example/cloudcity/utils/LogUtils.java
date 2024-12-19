@@ -1,3 +1,11 @@
+/**
+ * 日志工具类
+ * 用途：处理系统操作日志，包括：
+ * - 记录用户操作日志
+ * - 记录系统运行日志
+ * - 获取客户端IP地址
+ * - 将日志信息保存到数据库
+ */
 package com.example.cloudcity.utils;
 
 import jakarta.servlet.http.HttpServletRequest;

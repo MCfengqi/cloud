@@ -1,3 +1,11 @@
+/**
+ * 价格计算工具类
+ * 用途：处理价格计算，包括：
+ * - 提供精确的浮点数加法运算
+ * - 提供精确的浮点数减法运算
+ * - 使用BigDecimal确保计算精度
+ * - 支持float和double类型的运算
+ */
 package com.example.cloudcity.utils;
 
 import java.math.BigDecimal;

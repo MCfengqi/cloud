@@ -1,3 +1,12 @@
+/**
+ * 管理员管理Servlet
+ * 用途：处理管理员相关的所有后端请求，包括：
+ * 1. 管理员列表的获取和展示
+ * 2. 管理员信息的添加和注册
+ * 3. 管理员信息的修改和更新
+ * 4. 管理员账号的删除
+ * 5. 管理员权限的分配和管理
+ */
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
@@ -12,13 +21,10 @@ import java.util.*; // 导入Java集合框架
 import com.google.gson.Gson; // 导入Gson类用于JSON处理
 import com.google.gson.JsonObject; // 导入JsonObject类用于处理JSON对象
 import com.example.cloudcity.utils.LogUtils; // 导入LogUtils类用于日志记录
+import com.example.cloudcity.utils.DatabaseConfig;
 
 @WebServlet("/AdminManageServlet")
 public class AdminManageServlet extends HttpServlet { // 定义AdminManageServlet类继承自HttpServlet
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "root"; // 数据库用户名
-    private static final String PASS = "123456"; // 数据库密码
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8"); // 设置响应内容类型为JSON
@@ -122,7 +128,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
             }
 
             Class.forName("com.mysql.cj.jdbc.Driver"); // 加载MySQL驱动
-            conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+            conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
             stmt = conn.prepareStatement(sql.toString()); // 准备预编译SQL语句
 
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -202,7 +208,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
         String email = request.getParameter("email"); // 获取邮箱
         String mobile = request.getParameter("mobile"); // 获取手机号
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO users (username, password, email, mobile, is_admin) VALUES (?, ?, ?, ?, 1)")) { // 准备预编译SQL语句
 
@@ -240,7 +246,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
         PreparedStatement stmt = null;
 
         try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+            conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
 
             // 首先检查是否是最后一个管理员
             if (!isAdmin) {
@@ -305,7 +311,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
         long id = Long.parseLong(request.getParameter("id")); // 获取管理员ID
 
         // 检查是否是最后一个管理员
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) { // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS)) { // 获取数据库连接
             // 首先检查管理员总数
             String countSql = "SELECT COUNT(*) FROM users WHERE is_admin = 1"; // 准备SQL查询语句
             try (PreparedStatement countStmt = conn.prepareStatement(countSql)) {
@@ -339,7 +345,7 @@ public class AdminManageServlet extends HttpServlet { // 定义AdminManageServle
             throws SQLException, IOException {
         long id = Long.parseLong(request.getParameter("id")); // 获取管理员ID
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT * FROM users WHERE id = ? AND is_admin = 1")) { // 准备预编译SQL查询语句
 

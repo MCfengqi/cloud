@@ -1,3 +1,11 @@
+/**
+ * 数据源工具类
+ * 用途：管理数据库连接池，包括：
+ * - 初始化C3P0连接池
+ * - 提供数据源获取方法
+ * - 提供数据库连接获取方法
+ * - 管理连接池参数(初始连接数、最小连接数、最大连接数)
+ */
 package com.example.cloudcity.utils;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;

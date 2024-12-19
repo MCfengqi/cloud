@@ -21,13 +21,9 @@ import java.sql.*; // 导入SQL相关类
 import java.util.*; // 导入集合框架相关类
 import com.example.cloudcity.utils.LogUtils;
 import java.math.BigDecimal;
+import com.example.cloudcity.utils.DatabaseConfig;
 
 public class GameManageServlet extends HttpServlet { // 定义GameManageServlet类继承自HttpServlet
-    // 数据库连接信息
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "root"; // 数据库用户名
-    private static final String PASS = "123456"; // 数据库密码
-
     // 创建Gson对象用于JSON处理
     private final Gson gson = new Gson(); // 创建Gson实例
 
@@ -113,7 +109,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
         List<Map<String, Object>> games = new ArrayList<>(); // 创建List存储游戏信息
 
         // 查询所有游戏信息
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement("SELECT * FROM gamelist ORDER BY created_at DESC"); // 准备SQL查询语句
              ResultSet rs = stmt.executeQuery()) { // 执行查询并获取结果集
 
@@ -148,7 +144,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             throws SQLException, IOException {
         long gameId = Long.parseLong(request.getParameter("id")); // 获取请求中的游戏ID
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement("SELECT * FROM gamelist WHERE gameid = ?")) { // 准备SQL查询语句
 
             stmt.setLong(1, gameId); // 设置SQL查询参数
@@ -156,7 +152,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
 
             if (rs.next()) { // 检查结果集中是否有数据
                 // 构建游戏信息对象
-                Map<String, Object> game = new HashMap<>(); // 创��Map存储单个游戏信息
+                Map<String, Object> game = new HashMap<>(); // 创建Map存储单个游戏信息
                 game.put("gameid", rs.getLong("gameid")); // 存储游戏ID
                 game.put("gamename", rs.getString("gamename")); // 存储游戏名称
                 game.put("gameimg", rs.getString("gameimg")); // 存储游戏图片URL
@@ -187,7 +183,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
         String gamelink = jsonData.get("gamelink").getAsString(); // 获取游戏链接
         BigDecimal gamemoney = new BigDecimal(jsonData.get("gamemoney").getAsString());
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO gamelist (gamename, gameimg, gametxt, gamelink, gamemoney, created_at, updated_at) " +
                              "VALUES (?, ?, ?, ?, ?, NOW(), NOW())")) { // 准备SQL插入语句
@@ -228,7 +224,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
         String gamelink = jsonData.get("gamelink").getAsString(); // 获取游戏链接
         BigDecimal gamemoney = new BigDecimal(jsonData.get("gamemoney").getAsString());
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE gamelist SET gamename = ?, gameimg = ?, gametxt = ?, " +
                              "gamelink = ?, gamemoney = ?, updated_at = NOW() WHERE gameid = ?")) { // 准备SQL更新语句
@@ -265,7 +261,7 @@ public class GameManageServlet extends HttpServlet { // 定义GameManageServlet�
             throws SQLException, IOException {
         long gameId = jsonData.get("id").getAsLong(); // 获取游戏ID
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
              PreparedStatement stmt = conn.prepareStatement("DELETE FROM gamelist WHERE gameid = ?")) { // 准备SQL删除语句
 
             stmt.setLong(1, gameId); // 设置SQL删除参数

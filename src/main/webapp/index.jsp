@@ -102,7 +102,7 @@
             border-color: #0056b3;
         }
 
-        /* 主要内区域 */
+        /* 主要内域 */
         .main-content {
             margin-top: 0px;
             padding: 20px;
@@ -301,9 +301,9 @@
         <nav class="nav-links">
             <a href="index.jsp">游戏中心</a>
             <a href="#news">新闻资讯</a>
-            <a href="#" id="logQueryBtn" class="nav-links">日志查询</a>
-<%--            <a href="https://www.mcfengqi.icu/">我的网站</a>--%>
             <a href="dingdan.jsp">我的订单</a>
+            <a href="https://img.mcfengqi.icu" target="_blank">我的图床</a>
+            <a href="about.jsp">关于我们</a>
         </nav>
         <div class="auth-buttons">
             <a href="login.jsp" class="login-btn">登录</a>

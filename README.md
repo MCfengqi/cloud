@@ -3,44 +3,47 @@
 ![image](https://github.com/user-attachments/assets/d5813c68-bef0-4d83-81cf-ae68a384a3a3)
 ![image](https://github.com/user-attachments/assets/381a70d4-6d89-4454-bbab-19821041ab87)
 
-
-
+一个基于Java Web技术栈开发的游戏门户网站系统。
 
 ## 项目简介
-CloudCity 是一个基于 Java Web 技术栈开发的游戏管理系统，使用 Servlet 处理 HTTP 请求，MySQL 作为数据存储。
+
+云城游戏门户是一个现代化的游戏分发平台，提供游戏展示、购买、下载等功能。系统采用响应式设计，支持多终端访问。
 
 ## 技术栈
-- Java Servlet
-- MySQL
-- JSP
-- JDBC
-- JavaScript
-- CSS3
-- HTML5
+
+- **后端**：
+  - Java 11
+  - Jakarta Servlet 5.0
+  - MySQL 8.0
+  - Apache Commons DBUtils 1.7
+  - Gson 2.8.9
+  - SLF4J（日志框架）
+
+- **前端**：
+  - Bootstrap 5.3
+  - HTML5/CSS3
+  - JavaScript
+  - jQuery
+
+- **构建工具**：
+  - Maven
 
 ## 功能特性
-1. **用户管理**
-   - 普通用户和管理员分离管理
-   - 普通用户列表显示和管理
-   - 管理员列表显示和管理
-   - 用户信息的增删改查
-   - 用户类型区分（普通用户/超级管理员）
 
-2. **权限控制**
-   - 基于 Session 的登录验证
-   - 管理员特权功能
-   - 访问权限控制
+- 用户认证与授权
+- 游戏展示与搜索
+- 订单管理
+- 游戏购买
+- 操作日志记录
+- 响应式界面设计
 
-3. **界面功能**
-   - 响应式布局设计
-   - 动态菜单展开/收起
-   - 模态框显示详细信息
-   - 用户友好的操作界面
+## 数据库设计
 
-4. **数据管理**
-   - 用户数据的实时更新
-   - 最后登录时间记录
-   - 数据安���性保护
+系统包含以下主要数据表：
+- users：用户信息管理
+- gamelist：游戏列表
+- game_order：订单管理
+- operation_logs：操作日志
 
 ## 数据库配置
 - 数据库名：cloudcity
@@ -81,6 +84,47 @@ Cloud City 是一个基于 Java Web 技术栈开发的游戏内容管理平台�
 - 日志查询与管理
 - 支持多维度日志分析
 
+### 前台功能
+1. **游戏展示**
+   - 游戏列表展示
+   - 游戏详情页面
+   - 游戏价格显示
+   - 游戏图片预览
+
+2. **订单系统**
+   - 游戏购买
+   - 多种支付方式（支付宝/微信/QQ支付）
+   - 订单状态管理
+   - 订单历史查询
+
+3. **用户功能**
+   - 用户注册/登录
+   - 个人订单管理
+   - 个人信息修改
+
+### 后台功能
+1. **游戏管理**
+   - 游戏内容管理（增删改查）
+   - 游戏信息编辑
+   - 游戏图片管理
+   - 游戏价格设置
+
+2. **订单管理**
+   - 订单状态管理
+   - 订单查询功能
+   - 订单统计分析
+   - 支付记录查看
+
+3. **用户管理**
+   - 用户列表管理
+   - 用户权限控制
+   - 用户状态管理
+
+4. **系统管理**
+   - 管理员账户管理
+   - 系统日志查询
+   - 操作记录追踪
+
 ## 数据库设计
 ### users 表
 - 用户基本信息存储
@@ -109,31 +153,94 @@ Cloud City 是一个基于 Java Web 技术栈开发的游戏内容管理平台�
 - 字符集：utf8mb4
 - 存储引擎：InnoDB
 
-## 项目结构
-```
-cloud1/
-├── src/
-│   └── main/
-│       ├── java/        # Java 源代码
-│       ├── resources/   # 配置文件
-│       └── webapp/      # Web 资源
-├── .mvn/               # Maven 包装器配置
-├── pom.xml            # 项目依赖管理
-├── gamelist.sql       # 游戏数据表结构
-└── users.sql          # 用户数据表结构
+### game_order 表
+```sql
+CREATE TABLE `game_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '订单ID',
+  `total` decimal(10, 2) NOT NULL COMMENT '订单总金额',
+  `amount` decimal(10, 2) NOT NULL COMMENT '实际支付金额',
+  `status` varchar(50) NOT NULL COMMENT '订单状态',
+  `paytype` varchar(50) NOT NULL COMMENT '支付方式',
+  `gamename` varchar(100) NOT NULL COMMENT '游戏名',
+  `gameimg` varchar(6535) NOT NULL COMMENT '游戏照片',
+  `gametxt` text NOT NULL COMMENT '游戏介绍',
+  `datetime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建时间',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='游戏订单表';
 ```
 
 ## 开发环境要求
 - JDK 11 或以上
-- MySQL 8.0
+- MySQL 8.0 或以上
 - Maven 3.x
+- Tomcat 9.x 或以上
+
+## 安装说明
+
+1. 克隆项目到本地：
+```bash
+git clone [项目地址]
+```
+
+2. 导入数据库：
+```bash
+mysql -u your_username -p your_database < sql/cloudcity.sql
+```
+
+3. 修改数据库配置：
+配置文件位于 `src/main/resources/` 目录下
+
+4. 编译打包：
+```bash
+mvn clean package
+```
+
+5. 部署war包到Tomcat
+
+## 项目结构
+
+```
+cloud1/
+├── src/
+│   ├── main/
+│   │   ├── java/         # Java源代码
+│   │   ├── resources/    # 配置文件
+│   │   └── webapp/       # Web资源
+├── sql/                  # 数据库脚本
+├── pom.xml              # Maven配置
+└── README.md
+```
+
+## 开发团队
+- **党林龙**
+  - 角色：前端开发工程师
+  - 职责：负责项目的前端开发和UI设计
+  - 联系方式：qxsj@vip.qq.com
+
+- **杜旭晨**
+  - 角色：后端开发工程师
+  - 职责：负责项目的后端开发和数据库设计
+  - 联系方式：qxsj@vip.qq.com
 
 ## 部署说明
-1. 配置 MySQL 数据库
-2. 执行 users.sql 和 gamelist.sql 创建数据库表
-3. 配置数据库连接信息
-4. 使用 Maven 构建项目：`mvn clean package`
-5. 部署 war 包到 Servlet 容器
+1. **环境要求**
+   - JDK 17.0.9 LTS
+   - Tomcat 10.0.23
+   - MySQL 8.0.35
+   - Maven 3.x
+
+2. **配置步骤**
+   - 导入数据库脚本
+   - 修改数据库连接配置
+   - 编译打包项目
+   - 部署到Tomcat服务器
+
+3. **访问地址**
+   - 前台访问：http://localhost:8080/cloud1/
+   - 后台访问：http://localhost:8080/cloud1/login.jsp
+   - 默认管理员账号：adminFQ
+   - 默认管理员密码：123456
 
 ## 开发环境介绍
 
@@ -195,22 +302,50 @@ cloud1/
 ### 项目结构
 ```
 cloud1/
+├── .git/                      # Git版本控制目录
+├── .gitignore                 # Git忽略文件配置
+├── .idea/                     # IDE配置文件
+├── .mvn/                      # Maven包装器配置
 ├── src/
 │   └── main/
 │       ├── java/
-│       │   └── com/example/cloudcity/
-│       │       ├── servlet/    # Servlet控制器
-│       │       ├── model/      # 数据模型
-│       │       ├── utils/      # 工具类
-│       │       └── service/    # 业务逻辑
-│       ├── resources/          # 配置文件
+│       │   └── com/
+│       │       └── example/
+│       │           └── cloudcity/
+│       │               ├── dao/           # 数据访问层
+│       │               ├── filter/        # 过滤器
+│       │               ├── model/         # 数据模型
+│       │               ├── service/       # 业务逻辑层
+│       │               ├── servlet/       # Servlet控制器
+│       │               └── utils/         # 工具类
+│       ├── resources/                     # 配置文件
 │       └── webapp/
-│           ├── WEB-INF/
-│           ├── css/
-│           ├── js/
-│           └── images/
-├── pom.xml                     # Maven配置
-└── README.md                   # 项目文档
+│           ├── WEB-INF/                   # Web应用配置
+│           ├── css/                       # 样式文件
+│           │   └── *.css
+│           ├── js/                        # JavaScript文件
+│           │   └── *.js
+│           ├── images/                    # 图片资源
+│           ├── index.jsp                  # 首页
+│           ├── login.jsp                  # 登录页
+│           ├── register.jsp               # 注册页
+│           ├── about.jsp                  # 关于页面
+│           ├── dingdan.jsp                # 订单页面
+│           ├── xiangqing.jsp              # 详情页面
+│           ├── welcome.jsp                # 欢迎页面
+│           ├── logout.jsp                 # 登出处理
+│           └── error.jsp                  # 错误页面
+├── sql/                                   # SQL脚本文件
+│   ├── cloudcity.sql                      # 主数据库脚本
+│   ├── game_order.sql                     # 订单表脚本
+│   ├── gamelist.sql                       # 游戏列表脚本
+│   ├── operation_logs.sql                 # 操作日志脚本
+│   └── users.sql                          # 用户表脚本
+├── pom.xml                                # Maven配置文件
+├── mvnw                                   # Maven包装器脚本(Unix)
+├── mvnw.cmd                               # Maven包装器脚本(Windows)
+├── README.md                              # 项目说明文档
+└── target/                                # 编译输出目录
 ```
 
 ### 开发流程
@@ -625,3 +760,135 @@ cloud1/
 1. 如果被问到技术选择：强调Java Web技术栈的成熟稳定性和广泛应用
 2. 如果被问到开发难点：可以谈论前后端数据交互和图片处理的优化
 3. 如果被问到未来规划：可以详细展开游戏分类、评分系统的设计构想
+
+## 项目特色
+1. **用户体验**
+   - 响应式设计，适配多种设备
+   - 直观的操作界面
+   - 实时的操作反馈
+   - 友好的错误提示
+
+2. **安全性**
+   - 用户权限控制
+   - 数据加密存储
+   - SQL注入防护
+   - XSS攻击防护
+
+3. **可维护性**
+   - 模块化的代码结构
+   - 完善的注释文档
+   - 统一的编码规范
+   - 便捷的部署方案
+
+4. **扩展性**
+   - 插件化架构设计
+   - 接口标准化
+   - 配置外部化
+   - 易于功能扩展
+
+## 开发团队
+- **党林龙**
+  - 角色：前端开发工程师
+  - 职责：负责项目的前端开发和UI设计
+  - 联系方式：qxsj@vip.qq.com
+
+- **杜旭晨**
+  - 角色：后端开发工程师
+  - 职责：负责项目的后端开发和数据库设计
+  - 联系方式：qxsj@vip.qq.com
+
+## 部署说明
+1. **环境要求**
+   - JDK 17.0.9 LTS
+   - Tomcat 10.0.23
+   - MySQL 8.0.35
+   - Maven 3.x
+
+2. **配置步骤**
+   - 导入数据库脚本
+   - 修改数据库连接配置
+   - 编译打包项目
+   - 部署到Tomcat服务器
+
+3. **访问地址**
+   - 前台访问：http://localhost:8080/cloud1/
+   - 后台访问：http://localhost:8080/cloud1/login.jsp
+   - 默认管理员账号：adminFQ
+   - 默认管理员密码：123456
+
+## 开发环境介绍
+
+### 开发工具
+1. **IDE选择**
+   - IntelliJ IDEA 2023.2 旗舰版
+   - Visual Studio Code 1.84.0（前端代码编辑）
+   - Navicat Premium 16（数据库管理）
+
+2. **开发环境**
+   - 操作系统：Windows 11 专业版
+   - JDK版本：Java 17.0.9 LTS
+   - 服务器：Apache Tomcat 10.1.16
+   - 数据库：MySQL 8.0.35 Community
+
+### 项目依赖
+1. **后端依赖**
+   ```xml
+   <!-- Jakarta Servlet API -->
+   <dependency>
+       <groupId>jakarta.servlet</groupId>
+       <artifactId>jakarta.servlet-api</artifactId>
+       <version>5.0.0</version>
+   </dependency>
+
+   <!-- MySQL Connector -->
+   <dependency>
+       <groupId>mysql</groupId>
+       <artifactId>mysql-connector-java</artifactId>
+       <version>8.0.27</version>
+   </dependency>
+
+   <!-- JSON处理 -->
+   <dependency>
+       <groupId>com.google.code.gson</groupId>
+       <artifactId>gson</artifactId>
+       <version>2.8.9</version>
+   </dependency>
+   ```
+
+2. **前端技术**
+   - HTML5
+   - CSS3
+   - JavaScript ES6+
+   - Bootstrap 5.3.0
+   - jQuery 3.7.1
+
+### 开发规范
+1. **代码规范**
+   - 遵循阿里巴巴Java开发手册
+   - ESLint标准的JavaScript代码规范
+   - 统一的代码注释规范
+
+2. **版本控制**
+   - Git 2.42.0
+   - GitHub/Gitee托管
+   - 采用Git Flow工作流
+
+### 项目结构
+```
+cloud1/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/example/cloudcity/
+│       │       ├── servlet/    # Servlet控制器
+│       │       ├── model/      # 数据模型
+│       │       ├── utils/      # 工具类
+│       │       └── service/    # 业务逻辑
+│       ├── resources/          # 配置文件
+│       └── webapp/
+│           ├── WEB-INF/
+│           ├── css/
+│           ├── js/
+│           └── images/
+├── pom.xml                     # Maven配置
+└── README.md                   # 项目文档

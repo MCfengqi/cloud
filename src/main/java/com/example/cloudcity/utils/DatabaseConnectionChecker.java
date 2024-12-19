@@ -1,3 +1,11 @@
+
+/**
+ * 数据库连接检查工具类
+ * 用途：检查数据库连接是否正常，包括：
+ * - 测试数据库连接是否可用
+ * - 验证数据源配置是否正确
+ * - 提供数据库连接状态检查方法
+ */
 package com.example.cloudcity.utils;
 
 import javax.sql.DataSource;

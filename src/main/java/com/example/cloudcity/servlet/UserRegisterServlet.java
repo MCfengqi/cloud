@@ -1,3 +1,12 @@
+/**
+ * 用户注册Servlet
+ * 用途：处理用户注册相关的所有后端请求，包括：
+ * 1. 用户注册信息的验证
+ * 2. 用户名重复检查
+ * 3. 新用户信息的保存
+ * 4. 注册结果的反馈
+ * 5. 错误信息的处理
+ */
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
@@ -14,15 +23,11 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 
+import com.example.cloudcity.utils.DatabaseConfig;
 
 @WebServlet("/UserRegisterServlet")
 public class UserRegisterServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
-    // 数据库连接信息
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "root";
-    private static final String PASS = "123456";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 设置响应内容类型
@@ -83,7 +88,10 @@ public class UserRegisterServlet extends HttpServlet {
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(
+                DatabaseConfig.DB_URL, 
+                DatabaseConfig.USER, 
+                DatabaseConfig.PASS);
             
             // 首先检查用户名是否已存在
             String checkSql = "SELECT COUNT(*) FROM users WHERE username = ?";

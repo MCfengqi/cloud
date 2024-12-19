@@ -10,6 +10,7 @@ package com.example.cloudcity.servlet;
 
 import com.example.cloudcity.service.Admin;
 import com.example.cloudcity.service.AdminService;
+import com.example.cloudcity.utils.DatabaseConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet; // 导入HttpServlet类
 import jakarta.servlet.http.HttpServletRequest; // 导入HttpServletRequest类
@@ -29,9 +30,6 @@ import java.sql.Timestamp; // 导入Timestamp类用于处理时间戳
 
 public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类继承自HttpServlet
     private static final AdminService adminService = AdminService.getInstance(); // 获取AdminService实例
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "root"; // 数据库用户名
-    private static final String PASS = "123456"; // 数据库密码
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,7 +41,10 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
             if ("get".equals(action)) {
                 // 获取单个管理员信息
                 Long id = Long.parseLong(request.getParameter("id")); // 获取请求中的管理员ID
-                try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) { // 获取数据库连接
+                try (Connection conn = DriverManager.getConnection(
+                        DatabaseConfig.DB_URL, 
+                        DatabaseConfig.USER, 
+                        DatabaseConfig.PASS)) { // 获取数据库连接
                     String sql = "SELECT * FROM users WHERE id = ? AND is_admin = 1"; // 准备SQL查询语句
 
                     try (PreparedStatement stmt = conn.prepareStatement(sql)) { // 准备预编译SQL语句
@@ -75,7 +76,10 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
                 }
             } else {
                 // 获取管理员列表
-                try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) { // 获取数据库连接
+                try (Connection conn = DriverManager.getConnection(
+                        DatabaseConfig.DB_URL, 
+                        DatabaseConfig.USER, 
+                        DatabaseConfig.PASS)) { // 获取数据库连接
                     String sql = "SELECT * FROM users WHERE is_admin = 1"; // 准备SQL查询语句
                     try (PreparedStatement stmt = conn.prepareStatement(sql)) { // 准备预编译SQL语句
                         ResultSet rs = stmt.executeQuery(); // 执行查询并获取结果集

@@ -1,3 +1,12 @@
+/**
+ * 日志管理Servlet
+ * 用途：处理系统日志相关的所有后端请求，包括：
+ * 1. 系统操作日志的记录和存储
+ * 2. 日志列表的查询和展示
+ * 3. 日志的筛选和搜索功能
+ * 4. 日志的导出和备份
+ * 5. 日志的清理和维护
+ */
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
@@ -14,13 +23,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.example.cloudcity.utils.DatabaseConfig;
 
 @WebServlet("/LogManageServlet")
 public class LogManageServlet extends HttpServlet {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "root";
-    private static final String PASS = "123456";
-
+    /**
+     * 处理GET请求
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws ServletException Servlet异常
+     * @throws IOException IO异常
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -41,29 +54,13 @@ public class LogManageServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        String action = request.getParameter("action");
-
-        try {
-            switch (action) {
-                case "add":
-                    addLog(request, response);
-                    break;
-                case "delete":
-                    deleteLog(request, response);
-                    break;
-                default:
-                    sendError(response, "Unknown action: " + action);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            sendError(response, e.getMessage());
-        }
-    }
-
+    /**
+     * 获取日志列表
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void listLogs(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String startDate = request.getParameter("startDate");
@@ -92,7 +89,10 @@ public class LogManageServlet extends HttpServlet {
 
         System.out.println("Executing SQL: " + sql.toString());
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try (Connection conn = DriverManager.getConnection(
+                DatabaseConfig.DB_URL, 
+                DatabaseConfig.USER, 
+                DatabaseConfig.PASS);
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
             
             int paramIndex = 1;
@@ -130,6 +130,43 @@ public class LogManageServlet extends HttpServlet {
         response.getWriter().write(jsonResponse);
     }
 
+    /**
+     * 处理POST请求
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws ServletException Servlet异常
+     * @throws IOException IO异常
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        String action = request.getParameter("action");
+
+        try {
+            switch (action) {
+                case "add":
+                    addLog(request, response);
+                    break;
+                case "delete":
+                    deleteLog(request, response);
+                    break;
+                default:
+                    sendError(response, "Unknown action: " + action);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(response, e.getMessage());
+        }
+    }
+
+    /**
+     * 添加日志记录
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void addLog(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String operationType = request.getParameter("operation_type");
@@ -141,7 +178,10 @@ public class LogManageServlet extends HttpServlet {
         String sql = "INSERT INTO operation_logs (operation_type, operation_content, username, ip_address, result) " +
                     "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try (Connection conn = DriverManager.getConnection(
+                DatabaseConfig.DB_URL, 
+                DatabaseConfig.USER, 
+                DatabaseConfig.PASS);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, operationType);
@@ -157,13 +197,23 @@ public class LogManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 删除日志记录
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void deleteLog(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         long id = Long.parseLong(request.getParameter("id"));
 
         String sql = "DELETE FROM operation_logs WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try (Connection conn = DriverManager.getConnection(
+                DatabaseConfig.DB_URL, 
+                DatabaseConfig.USER, 
+                DatabaseConfig.PASS);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setLong(1, id);
@@ -175,6 +225,12 @@ public class LogManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 发送错误响应
+     * @param response HTTP响应对象
+     * @param message 错误信息
+     * @throws IOException IO异常
+     */
     private void sendError(HttpServletResponse response, String message) throws IOException {
         JsonObject json = new JsonObject();
         json.addProperty("error", message);

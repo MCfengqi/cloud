@@ -1,3 +1,12 @@
+/**
+ * 用户登录Servlet
+ * 用途：处理用户登录相关的所有后端请求，包括：
+ * 1. 用户登录验证和认证
+ * 2. 登录状态的维护和管理
+ * 3. 登录日志的记录和追踪
+ * 4. 登录安全控制和防护
+ * 5. 会话管理和维护
+ */
 package com.example.cloudcity.servlet;
 
 import jakarta.servlet.ServletException;
@@ -14,16 +23,20 @@ import java.sql.PreparedStatement; // 导入PreparedStatement类用于预编译S
 import java.sql.ResultSet; // 导入ResultSet类用于存储查询结果
 import java.sql.SQLException; // 导入SQLException类用于处理SQL异常
 import com.example.cloudcity.utils.LogUtils; // 导入LogUtils类用于日志记录
+import com.example.cloudcity.utils.DatabaseConfig;
 
 @WebServlet("/UserLoginServlet")
 public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类继承自HttpServlet
-    private static final long serialVersionUID = 1L; // 序列化版本号
+    /** 序列化版本号 */
+    private static final long serialVersionUID = 1L;
 
-    // 数据库连接信息
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity"; // 数据库URL
-    private static final String USER = "root"; // 数据库用户名
-    private static final String PASS = "123456"; // 数据库密码
-
+    /**
+     * 处理POST请求
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws ServletException Servlet异常
+     * @throws IOException IO异常
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -69,12 +82,24 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
         }
     }
 
-    // 创建一个内部类来保存用户信息
+    /**
+     * 用户信息内部类
+     * 用于存储用户的基本信息和登录状态
+     */
     private static class UserInfo {
-        String username; // 用户名
-        boolean isAdmin; // 是否为管理员
-        java.sql.Timestamp lastLoginTime; // 最后登录时间
+        /** 用户名 */
+        String username;
+        /** 是否为管理员 */
+        boolean isAdmin;
+        /** 最后登录时间 */
+        java.sql.Timestamp lastLoginTime;
 
+        /**
+         * 构造函数
+         * @param username 用户名
+         * @param isAdmin 是否为管理员
+         * @param lastLoginTime 最后登录时间
+         */
         UserInfo(String username, boolean isAdmin, java.sql.Timestamp lastLoginTime) {
             this.username = username; // 初始化用户名
             this.isAdmin = isAdmin; // 初始化是否为管理员
@@ -82,6 +107,12 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
         }
     }
 
+    /**
+     * 验证用户登录信息
+     * @param username 用户名
+     * @param password 密码
+     * @return UserInfo对象，如果验证失败返回null
+     */
     private UserInfo validateLogin(String username, String password) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -90,9 +121,9 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver"); // 加载MySQL驱动
-            conn = DriverManager.getConnection(DB_URL, USER, PASS); // 获取数据库连接
+            conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS); // 获取数据库连接
 
-            // 验证用户名和��码
+            // 验证用户名和密码
             String sql = "SELECT username, is_admin, updated_at FROM users WHERE username = ? AND password = ?";
             pstmt = conn.prepareStatement(sql); // 准备预编译SQL语句
             pstmt.setString(1, username); // 设置用户名参数
@@ -116,7 +147,7 @@ public class UserLoginServlet extends HttpServlet { // 定义UserLoginServlet类
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace(); // 打印堆栈跟踪信息
-            return null; // 返回null表示验证失���
+            return null; // 返回null表示验证失败
         } finally {
             try {
                 if (rs != null) rs.close(); // 关闭ResultSet

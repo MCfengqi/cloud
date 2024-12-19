@@ -1,11 +1,11 @@
 /**
  * 用户管理Servlet
  * 用途：处理用户相关的所有后端请求，包括：
- * 1. 用户列表的获取
- * 2. 用户信息的添加
- * 3. 用户信息的修改
- * 4. 用户的删除
- * 5. 用户权限的管理
+ * 1. 用户列表的获取和展示
+ * 2. 用户信息的添加和注册
+ * 3. 用户信息的修改和更新
+ * 4. 用户账号的删除
+ * 5. 用户权限的管理和控制
  */
 package com.example.cloudcity.servlet;
 
@@ -21,13 +21,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import com.example.cloudcity.utils.LogUtils;
+import com.example.cloudcity.utils.DatabaseConfig;
 
 public class
 UserManageServlet extends HttpServlet {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudcity";
-    private static final String USER = "root";
-    private static final String PASS = "123456";
-
+    /**
+     * 处理GET请求
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws ServletException Servlet异常
+     * @throws IOException IO异常
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
@@ -52,6 +56,13 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 处理POST请求
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws ServletException Servlet异常
+     * @throws IOException IO异常
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -108,6 +119,13 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 获取用户列表
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void listUsers(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -115,7 +133,7 @@ UserManageServlet extends HttpServlet {
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS);
             
             String sql = "SELECT * FROM users WHERE is_admin = 0";
             stmt = conn.prepareStatement(sql);
@@ -173,6 +191,14 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 从JSON数据添加用户
+     * @param jsonObject JSON数据对象
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void addUserFromJson(JsonObject jsonObject, HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         System.out.println("Received data: " + jsonObject.toString());
@@ -196,7 +222,7 @@ UserManageServlet extends HttpServlet {
             return;
         }
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS)) {
             String sql = "INSERT INTO users (username, password, email, mobile, is_admin, created_at, updated_at) " +
                         "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
             
@@ -226,6 +252,13 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 从表单数据添加用户
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void addUserFromForm(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String username = request.getParameter("username");
@@ -234,7 +267,7 @@ UserManageServlet extends HttpServlet {
         String mobile = request.getParameter("mobile");
         boolean isAdmin = "1".equals(request.getParameter("userType"));
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS)) {
             String sql = "INSERT INTO users (username, password, email, mobile, is_admin, created_at, updated_at) " +
                         "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
             
@@ -260,6 +293,14 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 更新用户信息
+     * @param data JSON数据对象
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void updateUser(JsonObject data, HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         try {
@@ -276,7 +317,7 @@ UserManageServlet extends HttpServlet {
             PreparedStatement stmt = null;
             
             try {
-                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS);
                 
                 // 构建更新 SQL
                 StringBuilder sql = new StringBuilder("UPDATE users SET username = ?, email = ?, mobile = ?, is_admin = ?, updated_at = NOW()");
@@ -326,6 +367,13 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 删除用户
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void deleteUser(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String idStr = request.getParameter("id");
@@ -333,7 +381,7 @@ UserManageServlet extends HttpServlet {
         try {
             long id = Long.parseLong(idStr);
             
-            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS);
                  PreparedStatement stmt = conn.prepareStatement(
                          "DELETE FROM users WHERE id = ?")) {
                 
@@ -362,6 +410,13 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 获取单个用户信息
+     * @param request HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws SQLException SQL异常
+     * @throws IOException IO异常
+     */
     private void getUser(HttpServletRequest request, HttpServletResponse response) 
             throws SQLException, IOException {
         String idStr = request.getParameter("id");
@@ -380,7 +435,7 @@ UserManageServlet extends HttpServlet {
             long id = Long.parseLong(idStr.trim());
             
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASS);
             
             // 修改 SQL 查询，移除 is_admin 限制
             String sql = "SELECT * FROM users WHERE id = ?";
@@ -423,6 +478,11 @@ UserManageServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 转义JSON字符串
+     * @param input 需要转义的字符串
+     * @return 转义后的字符串
+     */
     private String escapeJson(String input) {
         if (input == null) {
             return "";
