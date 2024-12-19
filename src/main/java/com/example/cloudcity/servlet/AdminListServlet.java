@@ -37,7 +37,8 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
         response.setContentType("application/json;charset=UTF-8"); // 设置响应内容类型为JSON
 
         try {
-            String action = request.getParameter("action"); // 获取请求中的action参数
+            // 获取请求中的action参数
+            String action = request.getParameter("action"); 
             if ("get".equals(action)) {
                 // 获取单个管理员信息
                 Long id = Long.parseLong(request.getParameter("id")); // 获取请求中的管理员ID
@@ -45,56 +46,71 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
                         DatabaseConfig.DB_URL, 
                         DatabaseConfig.USER, 
                         DatabaseConfig.PASS)) { // 获取数据库连接
-                    String sql = "SELECT * FROM users WHERE id = ? AND is_admin = 1"; // 准备SQL查询语句
+                    // 准备SQL查询语句，根据管理员ID查询管理员信息
+                    String sql = "SELECT * FROM users WHERE id = ? AND is_admin = 1"; 
 
                     try (PreparedStatement stmt = conn.prepareStatement(sql)) { // 准备预编译SQL语句
-                        stmt.setLong(1, id); // 设置SQL查询参数
-                        ResultSet rs = stmt.executeQuery(); // 执行查询并获取结果集
+                        // 设置SQL参数并执行查询
+                        stmt.setLong(1, id);
+                        ResultSet rs = stmt.executeQuery();
 
-                        if (rs.next()) { // 检查结果集中是否有数据
-                            JsonObject admin = new JsonObject(); // 创建JsonObject存储管理员信息
-                            admin.addProperty("id", rs.getLong("id")); // 存储管理员ID
-                            admin.addProperty("username", rs.getString("username")); // 存储用户名
-                            admin.addProperty("password", rs.getString("password")); // 存储密码
-                            admin.addProperty("email", rs.getString("email")); // 存储邮箱
-                            admin.addProperty("mobile", rs.getString("mobile")); // 存储手机号
-                            admin.addProperty("isAdmin", rs.getBoolean("is_admin")); // 存储是否为管理员
+                        if (rs.next()) {
+                            // 找到管理员记录，创建JSON对象存储信息
+                            JsonObject admin = new JsonObject();
+                            // 依次添加管理员的各项信息到JSON对象中
+                            admin.addProperty("id", rs.getLong("id"));
+                            admin.addProperty("username", rs.getString("username"));
+                            admin.addProperty("password", rs.getString("password"));
+                            admin.addProperty("email", rs.getString("email"));
+                            admin.addProperty("mobile", rs.getString("mobile"));
+                            admin.addProperty("isAdmin", rs.getBoolean("is_admin"));
+                            
+                            // 处理创建时间，如果为null则返回null
                             admin.addProperty("created_at",
                                     rs.getTimestamp("created_at") != null ?
-                                            rs.getTimestamp("created_at").toString() : null); // 存储创建时间
+                                            rs.getTimestamp("created_at").toString() : null);
+                            
+                            // 处理更新时间，如果为null则返回null
                             admin.addProperty("updated_at",
                                     rs.getTimestamp("updated_at") != null ?
-                                            rs.getTimestamp("updated_at").toString() : null); // 存储更新时间
+                                            rs.getTimestamp("updated_at").toString() : null);
 
-                            response.getWriter().write(admin.toString()); // 将管理员信息转换为JSON并写入响应
+                            // 将JSON对象写入响应
+                            response.getWriter().write(admin.toString());
                         } else {
-                            JsonObject error = new JsonObject(); // 创建JsonObject存储错误信息
-                            error.addProperty("error", "管理员不存在"); // 设置错误消息
-                            response.getWriter().write(error.toString()); // 将错误信息转换为JSON并写入响应
+                            // 未找到管理员记录，返回错误信息
+                            JsonObject error = new JsonObject();
+                            error.addProperty("error", "管理员不存在");
+                            response.getWriter().write(error.toString());
                         }
                     }
                 }
             } else {
-                // 获取管理员列表
+                // 获取所有管理员列表的处理逻辑
                 try (Connection conn = DriverManager.getConnection(
                         DatabaseConfig.DB_URL, 
                         DatabaseConfig.USER, 
-                        DatabaseConfig.PASS)) { // 获取数据库连接
-                    String sql = "SELECT * FROM users WHERE is_admin = 1"; // 准备SQL查询语句
-                    try (PreparedStatement stmt = conn.prepareStatement(sql)) { // 准备预编译SQL语句
-                        ResultSet rs = stmt.executeQuery(); // 执行查询并获取结果集
+                        DatabaseConfig.PASS)) {
+                    // 查询所有管理员用户的SQL语句
+                    String sql = "SELECT * FROM users WHERE is_admin = 1";
+                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                        // 执行查询并获取结果集
+                        ResultSet rs = stmt.executeQuery();
 
-                        StringBuilder jsonBuilder = new StringBuilder(); // 创建StringBuilder存储JSON数据
+                        // 创建StringBuilder存储JSON数据
+                        StringBuilder jsonBuilder = new StringBuilder(); 
                         jsonBuilder.append("["); // 开始构建JSON数组
                         boolean first = true; // 标记是否为第一个元素
 
-                        while (rs.next()) { // 遍历结果集中的每一行
+                        // 遍历结果集中的每一行
+                        while (rs.next()) { 
                             if (!first) {
                                 jsonBuilder.append(","); // 如果不是第一个元素，添加逗号分隔符
                             }
                             first = false; // 设置标记为false表示已经处理过一个元素
 
-                            jsonBuilder.append("{") // 开始构建JSON对象
+                            // 开始构建JSON对象
+                            jsonBuilder.append("{") 
                                     .append("\"id\":").append(rs.getLong("id")).append(",") // 存储管理员ID
                                     .append("\"username\":\"").append(escapeJson(rs.getString("username"))).append("\",") // 存储用户名
                                     .append("\"password\":\"").append(escapeJson(rs.getString("password"))).append("\",") // 存储密码
@@ -109,16 +125,20 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
                         }
 
                         jsonBuilder.append("]"); // 结束构建JSON数组
-                        response.getWriter().write(jsonBuilder.toString()); // 将JSON数据写入响应
+                        // 将JSON数据写入响应
+                        response.getWriter().write(jsonBuilder.toString()); 
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("AdminListServlet错误: " + e.getMessage()); // 打印错误信息到控制台
+            // 打印错误信息到控制台
+            System.err.println("AdminListServlet错误: " + e.getMessage()); 
             e.printStackTrace(); // 打印堆栈跟踪信息
-            JsonObject error = new JsonObject(); // 创建JsonObject存储错误信息
+            // 创建JsonObject存储错误信息
+            JsonObject error = new JsonObject(); 
             error.addProperty("error", e.getMessage()); // 设置错误消息
-            response.getWriter().write(error.toString()); // 将错误信息转换为JSON并写入响应
+            // 将错误信息转换为JSON并写入响应
+            response.getWriter().write(error.toString()); 
         }
     }
 
@@ -128,42 +148,61 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
         response.setContentType("application/json;charset=UTF-8"); // 设置响应内容类型为JSON
 
         try {
-            BufferedReader reader = request.getReader(); // 获取请求体的BufferedReader
-            StringBuilder sb = new StringBuilder(); // 创建StringBuilder存储请求体内容
+            // 获取请求体的BufferedReader
+            BufferedReader reader = request.getReader(); 
+            // 创建StringBuilder存储请求体内容
+            StringBuilder sb = new StringBuilder(); 
             String line;
-            while ((line = reader.readLine()) != null) { // 逐行读取请求体内容
+            // 逐行读取请求体内容
+            while ((line = reader.readLine()) != null) { 
                 sb.append(line); // 将每一行内容追加到StringBuilder中
             }
 
-            Gson gson = new Gson(); // 创建Gson实例
-            JsonObject jsonObject = gson.fromJson(sb.toString(), JsonObject.class); // 使用Gson解析JSON字符串为JsonObject
-            String action = jsonObject.get("action").getAsString(); // 获取action参数
+            // 创建Gson实例
+            Gson gson = new Gson(); 
+            // 使用Gson解析JSON字符串为JsonObject
+            JsonObject jsonObject = gson.fromJson(sb.toString(), JsonObject.class); 
+            // 获取action参数
+            String action = jsonObject.get("action").getAsString(); 
 
-            JsonObject result = new JsonObject(); // 创建JsonObject存储响应数据
+            // 创建JsonObject存储响应数据
+            JsonObject result = new JsonObject(); 
 
+            // 根据action参数执行不同的操作
             switch (action) {
                 case "add":
                     // 处理添加管理员
-                    String username = jsonObject.get("username").getAsString(); // 获取用户名
-                    String password = jsonObject.get("password").getAsString(); // 获取密码
-                    String email = jsonObject.get("email").getAsString(); // 获取邮箱
-                    String mobile = jsonObject.get("mobile").getAsString(); // 获取手机号
+                    // 获取用户名
+                    String username = jsonObject.get("username").getAsString(); 
+                    // 获取密码
+                    String password = jsonObject.get("password").getAsString(); 
+                    // 获取邮箱
+                    String email = jsonObject.get("email").getAsString(); 
+                    // 获取手机号
+                    String mobile = jsonObject.get("mobile").getAsString(); 
                     // TODO: 实现添加管理员的逻辑
                     result.addProperty("success", true); // 设置成功标志
                     break;
 
                 case "update":
-                    Long id = jsonObject.get("id").getAsLong(); // 获取管理员ID
-                    username = jsonObject.get("username").getAsString(); // 获取用户名
-                    email = jsonObject.get("email").getAsString(); // 获取邮箱
-                    mobile = jsonObject.get("mobile").getAsString(); // 获取手机号
-                    boolean success = adminService.updateAdmin(id, username, email, mobile); // 调用服务更新管理员信息
+                    // 获取管理员ID
+                    Long id = jsonObject.get("id").getAsLong(); 
+                    // 获取用户名
+                    username = jsonObject.get("username").getAsString(); 
+                    // 获取邮箱
+                    email = jsonObject.get("email").getAsString(); 
+                    // 获取手机号
+                    mobile = jsonObject.get("mobile").getAsString(); 
+                    // 调用服务更新管理员信息
+                    boolean success = adminService.updateAdmin(id, username, email, mobile); 
                     result.addProperty("success", success); // 设置成功标志
                     break;
 
                 case "delete":
-                    id = jsonObject.get("id").getAsLong(); // 获取管理员ID
-                    success = adminService.deleteAdmin(id); // 调用服务删除管理员
+                    // 获取管理员ID
+                    id = jsonObject.get("id").getAsLong(); 
+                    // 调用服务删除管理员
+                    success = adminService.deleteAdmin(id); 
                     result.addProperty("success", success); // 设置成功标志
                     break;
 
@@ -172,14 +211,18 @@ public class AdminListServlet extends HttpServlet { // 定义AdminListServlet类
                     result.addProperty("error", "Unknown action"); // 设置错误消息
             }
 
-            response.getWriter().write(result.toString()); // 将响应数据转换为JSON并写入响应
+            // 将响应数据转换为JSON并写入响应
+            response.getWriter().write(result.toString()); 
 
         } catch (Exception e) {
-            e.printStackTrace(); // 打印堆栈跟踪信息
-            JsonObject result = new JsonObject(); // 创建JsonObject存储错误响应数据
+            // 打印堆栈跟踪信息
+            e.printStackTrace(); 
+            // 创建JsonObject存储错误响应数据
+            JsonObject result = new JsonObject(); 
             result.addProperty("success", false); // 设置失败标志
             result.addProperty("error", e.getMessage()); // 设置错误消息
-            response.getWriter().write(result.toString()); // 将错误响应数据转换为JSON并写入响应
+            // 将错误响应数据转换为JSON并写入响应
+            response.getWriter().write(result.toString()); 
         }
     }
 
